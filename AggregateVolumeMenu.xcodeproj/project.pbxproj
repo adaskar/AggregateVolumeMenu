@@ -11,6 +11,8 @@
 		CABDF11B2590FD56006F420A /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CABDF11A2590FD56006F420A /* ViewController.swift */; };
 		CABDF11D2590FD57006F420A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CABDF11C2590FD57006F420A /* Assets.xcassets */; };
 		CABDF1202590FD57006F420A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CABDF11E2590FD57006F420A /* Main.storyboard */; };
+		CABDF13225911675006F420A /* MyApplication.swift in Sources */ = {isa = PBXBuildFile; fileRef = CABDF12E25911571006F420A /* MyApplication.swift */; };
+		CABDF136259138E8006F420A /* AggregateVolumeControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = CABDF135259138E8006F420A /* AggregateVolumeControl.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -21,6 +23,8 @@
 		CABDF11F2590FD57006F420A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		CABDF1212590FD57006F420A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		CABDF1222590FD57006F420A /* AggregateVolumeMenu.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AggregateVolumeMenu.entitlements; sourceTree = "<group>"; };
+		CABDF12E25911571006F420A /* MyApplication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyApplication.swift; sourceTree = "<group>"; };
+		CABDF135259138E8006F420A /* AggregateVolumeControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AggregateVolumeControl.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -53,12 +57,14 @@
 		CABDF1172590FD56006F420A /* AggregateVolumeMenu */ = {
 			isa = PBXGroup;
 			children = (
+				CABDF12E25911571006F420A /* MyApplication.swift */,
 				CABDF1182590FD56006F420A /* AppDelegate.swift */,
 				CABDF11A2590FD56006F420A /* ViewController.swift */,
 				CABDF11C2590FD57006F420A /* Assets.xcassets */,
 				CABDF11E2590FD57006F420A /* Main.storyboard */,
 				CABDF1212590FD57006F420A /* Info.plist */,
 				CABDF1222590FD57006F420A /* AggregateVolumeMenu.entitlements */,
+				CABDF135259138E8006F420A /* AggregateVolumeControl.swift */,
 			);
 			path = AggregateVolumeMenu;
 			sourceTree = "<group>";
@@ -132,8 +138,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CABDF13225911675006F420A /* MyApplication.swift in Sources */,
 				CABDF11B2590FD56006F420A /* ViewController.swift in Sources */,
 				CABDF1192590FD56006F420A /* AppDelegate.swift in Sources */,
+				CABDF136259138E8006F420A /* AggregateVolumeControl.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

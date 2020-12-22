@@ -8,19 +8,35 @@
 import Cocoa
 
 class ViewController: NSViewController {
-
+    let avcControl = AggregateVolumeControl()
+    
+    @IBOutlet weak var hsVolume: NSSlider!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Do any additional setup after loading the view.
+        hsVolume.minValue = 0
+        hsVolume.maxValue = 1
+        hsVolume.isContinuous = true
+        hsVolume.floatValue = avcControl.getVolume()
     }
 
     override var representedObject: Any? {
         didSet {
-        // Update the view, if already loaded.
         }
     }
-
+    @IBAction func hsVolumeChanged(_ sender: Any) {
+        avcControl.setVolume(volume: hsVolume.floatValue)
+    }
+    
+    static func newInstance() -> ViewController {
+        let storyboard = NSStoryboard(name: NSStoryboard.Name("Main"), bundle: nil)
+        let identifier = NSStoryboard.SceneIdentifier("ViewController")
+          
+        guard let viewcontroller = storyboard.instantiateController(withIdentifier: identifier) as? ViewController else {
+            fatalError("Unable to instantiate ViewController in Main.storyboard")
+        }
+        return viewcontroller
+    }
 
 }
 
