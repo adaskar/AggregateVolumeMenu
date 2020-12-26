@@ -16,7 +16,7 @@ class ViewController: NSViewController {
         super.viewDidLoad()
         hsVolume.minValue = 0
         hsVolume.maxValue = 1
-        hsVolume.isContinuous = true
+        hsVolume.isContinuous = false
         hsVolume.floatValue = avcControl.getVolume()
     }
 
