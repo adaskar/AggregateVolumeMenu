@@ -23,7 +23,7 @@ class MyApplication: NSApplication {
         if (state) {
             switch(key) {
             case NX_KEYTYPE_MUTE:
-                avcControl.setVolume(volume: 0.0)
+                avcControl.switchMute()
                 break
             case NX_KEYTYPE_SOUND_DOWN:
                 var vol = avcControl.getVolume()

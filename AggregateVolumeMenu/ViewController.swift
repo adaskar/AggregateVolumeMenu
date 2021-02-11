@@ -19,6 +19,10 @@ class ViewController: NSViewController {
         hsVolume.isContinuous = false
         hsVolume.floatValue = avcControl.getVolume()
     }
+    
+    override func viewWillAppear() {
+        hsVolume.floatValue = avcControl.getVolume()
+    }
 
     override var representedObject: Any? {
         didSet {
