@@ -17,8 +17,6 @@ class AggregateVolumeControl {
     var subDeviceCount:Int = 0;
     var subDevicesID = [AudioDeviceID]()
     
-    var lastMute = false
-    
     init() {
         
         // get default audio output device
@@ -132,12 +130,12 @@ class AggregateVolumeControl {
     func setVolume(volume:Float) {
         var vol = volume
         if (vol == 0) {
-            if (!lastMute) {
+            if (!getMute()) {
                 switchMute()
             }
             return
         }
-        if (lastMute) {
+        if (getMute()) {
             switchMute()
         }
         for i in 0..<subDeviceCount {
@@ -168,10 +166,48 @@ class AggregateVolumeControl {
         }
     }
     
+    func getMute() -> Bool {
+        for i in 0..<subDeviceCount {
+            let subDevice:AudioDeviceID = subDevicesID[i]
+            
+            var mute:UInt32 = 0
+                        
+            address = AudioObjectPropertyAddress(
+                mSelector:AudioObjectPropertySelector(kAudioDevicePropertyMute),
+                mScope:AudioObjectPropertyScope(kAudioDevicePropertyScopeOutput),
+                mElement:1)
+            propsize = UInt32(MemoryLayout<UInt32>.size)
+            
+            result = AudioObjectGetPropertyData(subDevice, &address, 0, nil, &propsize, &mute)
+            if (result != 0) {
+                print("kAudioDevicePropertyVolumeScalar volLeft")
+                exit(-1)
+            }
+            if (mute == 1) {
+                return true
+            }
+            
+            address = AudioObjectPropertyAddress(
+                mSelector:AudioObjectPropertySelector(kAudioDevicePropertyMute),
+                mScope:AudioObjectPropertyScope(kAudioDevicePropertyScopeOutput),
+                mElement:2)
+            propsize = UInt32(MemoryLayout<UInt32>.size)
+            result = AudioObjectGetPropertyData(subDevice, &address, 0, nil, &propsize, &mute)
+            if (result != 0) {
+                print("kAudioDevicePropertyVolumeScalar volRight")
+                exit(-1)
+            }
+            if (mute == 1) {
+                return true
+            }
+        }
+        return false
+    }
+    
     func switchMute() {
-        lastMute = !lastMute
+        let mute = !getMute()
         
-        var mut: UInt32 = (lastMute == true) ? 1 : 0
+        var mut: UInt32 = (mute == true) ? 1 : 0
         for i in 0..<subDeviceCount {
             let subDevice:AudioDeviceID = subDevicesID[i]
             
