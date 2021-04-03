@@ -30,7 +30,7 @@ class AggregateVolumeControl {
         result = AudioObjectGetPropertyData(AudioDeviceID(kAudioObjectSystemObject), &address, 0, nil, &propsize, &audioDeviceID)
 
         if (result != 0) {
-            print("kAudioHardwarePropertyDefaultOutputDevice")
+            print("kAudioHardwarePropertyDefaultOutputDevice result:\(result)")
             exit(-1)
         }
 
@@ -45,7 +45,7 @@ class AggregateVolumeControl {
         result = AudioObjectGetPropertyData(audioDeviceID, &address, 0, nil, &propsize, &audioDeviceUID)
 
         if (result != 0) {
-            print("kAudioDevicePropertyDeviceUID")
+            print("kAudioDevicePropertyDeviceUID result:\(result)")
             exit(-1)
         }
 
@@ -59,14 +59,14 @@ class AggregateVolumeControl {
         result = AudioObjectGetPropertyData(audioDeviceID, &address, 0, nil, &propsize, &transportType)
 
         if (result != 0) {
-            print("kAudioDevicePropertyTransportType")
+            print("kAudioDevicePropertyTransportType result:\(result)")
             exit(-1)
         }
 
         // if transportType is not Aggregate then exit the tool
         if (transportType != kAudioDeviceTransportTypeAggregate) {
             print("audioDeviceID: \(audioDeviceID) uid: \(audioDeviceUID as String? ?? "") transportType: \(transportType == kAudioDeviceTransportTypeAggregate)")
-            print("this tool only works with a kAudioDeviceTransportTypeAggregate")
+            print("this tool only works with a kAudioDeviceTransportTypeAggregate result:\(result)")
             exit(1)
         }
 
@@ -82,7 +82,7 @@ class AggregateVolumeControl {
         result = AudioObjectGetPropertyData(audioDeviceID, &address, 0, nil, &propsize, &subDevicesID)
 
         if (result != 0) {
-            print("kAudioAggregateDevicePropertyActiveSubDeviceList")
+            print("kAudioAggregateDevicePropertyActiveSubDeviceList result:\(result)")
             exit(-1)
         }
 
@@ -105,7 +105,7 @@ class AggregateVolumeControl {
             
             result = AudioObjectGetPropertyData(subDevice, &address, 0, nil, &propsize, &volLeft)
             if (result != 0) {
-                print("kAudioDevicePropertyVolumeScalar volLeft")
+                print("kAudioDevicePropertyVolumeScalar volLeft result:\(result)")
                 exit(-1)
             }
             
@@ -116,7 +116,7 @@ class AggregateVolumeControl {
             propsize = UInt32(MemoryLayout<Float>.size)
             result = AudioObjectGetPropertyData(subDevice, &address, 0, nil, &propsize, &volRight)
             if (result != 0) {
-                print("kAudioDevicePropertyVolumeScalar volRight")
+                print("kAudioDevicePropertyVolumeScalar volRight result:\(result)")
                 exit(-1)
             }
             
@@ -149,7 +149,7 @@ class AggregateVolumeControl {
             
             result = AudioObjectSetPropertyData(subDevice, &address, 0, nil, propsize, &vol)
             if (result != 0) {
-                print("kAudioDevicePropertyVolumeScalar volLeft")
+                print("kAudioDevicePropertyVolumeScalar volLeft result:\(result)")
                 exit(-1)
             }
             
@@ -160,7 +160,7 @@ class AggregateVolumeControl {
             propsize = UInt32(MemoryLayout<Float>.size)
             result = AudioObjectSetPropertyData(subDevice, &address, 0, nil, propsize, &vol)
             if (result != 0) {
-                print("kAudioDevicePropertyVolumeScalar volRight")
+                print("kAudioDevicePropertyVolumeScalar volRight result:\(result)")
                 exit(-1)
             }
         }
@@ -180,7 +180,7 @@ class AggregateVolumeControl {
             
             result = AudioObjectGetPropertyData(subDevice, &address, 0, nil, &propsize, &mute)
             if (result != 0) {
-                print("kAudioDevicePropertyVolumeScalar volLeft")
+                print("kAudioDevicePropertyVolumeScalar volLeft result:\(result)")
                 exit(-1)
             }
             if (mute == 1) {
@@ -194,7 +194,7 @@ class AggregateVolumeControl {
             propsize = UInt32(MemoryLayout<UInt32>.size)
             result = AudioObjectGetPropertyData(subDevice, &address, 0, nil, &propsize, &mute)
             if (result != 0) {
-                print("kAudioDevicePropertyVolumeScalar volRight")
+                print("kAudioDevicePropertyVolumeScalar volRight result:\(result)")
                 exit(-1)
             }
             if (mute == 1) {
@@ -219,7 +219,7 @@ class AggregateVolumeControl {
             
             result = AudioObjectSetPropertyData(subDevice, &address, 0, nil, propsize, &mut)
             if (result != 0) {
-                print("kAudioDevicePropertyMute volLeft")
+                print("kAudioDevicePropertyMute volLeft result:\(result)")
                 exit(-1)
             }
             
@@ -230,7 +230,7 @@ class AggregateVolumeControl {
             propsize = UInt32(MemoryLayout<UInt32>.size)
             result = AudioObjectSetPropertyData(subDevice, &address, 0, nil, propsize, &mut)
             if (result != 0) {
-                print("kAudioDevicePropertyMute volRight")
+                print("kAudioDevicePropertyMute volRight result:\(result)")
                 exit(-1)
             }
         }
