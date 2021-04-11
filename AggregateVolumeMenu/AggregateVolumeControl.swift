@@ -89,38 +89,58 @@ class AggregateVolumeControl {
         subDeviceCount = Int((propsize / UInt32(MemoryLayout<AudioDeviceID>.size)))
     }
     
+    func getChannels(subDevice: AudioDeviceID) -> [UInt32] {
+        var channelNumbers = [UInt32]()
+        
+        for _ in 0..<32 {
+            channelNumbers.append(UInt32())
+        }
+        
+        address = AudioObjectPropertyAddress(
+            mSelector:AudioObjectPropertySelector(kAudioDevicePropertyPreferredChannelsForStereo),
+            mScope:AudioObjectPropertyScope(kAudioDevicePropertyScopeOutput),
+            mElement:AudioObjectPropertyElement(kAudioObjectPropertyElementMaster))
+        
+        propsize = UInt32(MemoryLayout<UInt32>.size * 32)
+        result = AudioObjectGetPropertyData(subDevice, &address, 0, nil, &propsize, &channelNumbers)
+        if (result != 0) {
+            print("kAudioDevicePropertyPreferredChannelsForStereo result:\(result)")
+            exit(-1)
+        }
+        
+        if ((Int(propsize) / MemoryLayout<UInt32>.size) < 32) {
+            let range = (Int(propsize) / MemoryLayout<UInt32>.size)...31
+            channelNumbers.removeSubrange(range)
+        }
+        return channelNumbers
+    }
+    
     func getVolume() -> Float {
         var volAvg:Float = 0.0
+        
         for i in 0..<subDeviceCount {
             let subDevice:AudioDeviceID = subDevicesID[i]
+            let channels = getChannels(subDevice: subDevice)
             
-            var volLeft:Float = 0.0
-            var volRight:Float = 0.0
-                        
-            address = AudioObjectPropertyAddress(
-                mSelector:AudioObjectPropertySelector(kAudioDevicePropertyVolumeScalar),
-                mScope:AudioObjectPropertyScope(kAudioDevicePropertyScopeOutput),
-                mElement:1)
-            propsize = UInt32(MemoryLayout<Float>.size)
-            
-            result = AudioObjectGetPropertyData(subDevice, &address, 0, nil, &propsize, &volLeft)
-            if (result != 0) {
-                print("kAudioDevicePropertyVolumeScalar volLeft result:\(result)")
-                exit(-1)
+            var volSum: Float = 0.0
+            for channel in channels {
+                var vol: Float = 0.0
+                address = AudioObjectPropertyAddress(
+                    mSelector:AudioObjectPropertySelector(kAudioDevicePropertyVolumeScalar),
+                    mScope:AudioObjectPropertyScope(kAudioDevicePropertyScopeOutput),
+                    mElement:channel)
+                propsize = UInt32(MemoryLayout<Float>.size)
+                
+                result = AudioObjectGetPropertyData(subDevice, &address, 0, nil, &propsize, &vol)
+                if (result != 0) {
+                    print("kAudioDevicePropertyVolumeScalar channel:\(channel) result:\(result)")
+                    exit(-1)
+                }
+                
+                volSum += vol
             }
             
-            address = AudioObjectPropertyAddress(
-                mSelector:AudioObjectPropertySelector(kAudioDevicePropertyVolumeScalar),
-                mScope:AudioObjectPropertyScope(kAudioDevicePropertyScopeOutput),
-                mElement:2)
-            propsize = UInt32(MemoryLayout<Float>.size)
-            result = AudioObjectGetPropertyData(subDevice, &address, 0, nil, &propsize, &volRight)
-            if (result != 0) {
-                print("kAudioDevicePropertyVolumeScalar volRight result:\(result)")
-                exit(-1)
-            }
-            
-            volAvg += (volLeft + volRight) / 2
+            volAvg += volSum / Float(channels.count)
         }
 
         volAvg = volAvg / Float(subDeviceCount)
@@ -140,28 +160,20 @@ class AggregateVolumeControl {
         }
         for i in 0..<subDeviceCount {
             let subDevice:AudioDeviceID = subDevicesID[i]
+            let channels = getChannels(subDevice: subDevice)
             
-            address = AudioObjectPropertyAddress(
-                mSelector:AudioObjectPropertySelector(kAudioDevicePropertyVolumeScalar),
-                mScope:AudioObjectPropertyScope(kAudioDevicePropertyScopeOutput),
-                mElement:1)
-            propsize = UInt32(MemoryLayout<Float>.size)
-            
-            result = AudioObjectSetPropertyData(subDevice, &address, 0, nil, propsize, &vol)
-            if (result != 0) {
-                print("kAudioDevicePropertyVolumeScalar volLeft result:\(result)")
-                exit(-1)
-            }
-            
-            address = AudioObjectPropertyAddress(
-                mSelector:AudioObjectPropertySelector(kAudioDevicePropertyVolumeScalar),
-                mScope:AudioObjectPropertyScope(kAudioDevicePropertyScopeOutput),
-                mElement:2)
-            propsize = UInt32(MemoryLayout<Float>.size)
-            result = AudioObjectSetPropertyData(subDevice, &address, 0, nil, propsize, &vol)
-            if (result != 0) {
-                print("kAudioDevicePropertyVolumeScalar volRight result:\(result)")
-                exit(-1)
+            for channel in channels {
+                address = AudioObjectPropertyAddress(
+                    mSelector:AudioObjectPropertySelector(kAudioDevicePropertyVolumeScalar),
+                    mScope:AudioObjectPropertyScope(kAudioDevicePropertyScopeOutput),
+                    mElement:channel)
+                propsize = UInt32(MemoryLayout<Float>.size)
+                
+                result = AudioObjectSetPropertyData(subDevice, &address, 0, nil, propsize, &vol)
+                if (result != 0) {
+                    print("kAudioDevicePropertyVolumeScalar channel:\(channel) result:\(result)")
+                    exit(-1)
+                }
             }
         }
     }
@@ -169,36 +181,25 @@ class AggregateVolumeControl {
     func getMute() -> Bool {
         for i in 0..<subDeviceCount {
             let subDevice:AudioDeviceID = subDevicesID[i]
+            let channels = getChannels(subDevice: subDevice)
             
             var mute:UInt32 = 0
-                        
-            address = AudioObjectPropertyAddress(
-                mSelector:AudioObjectPropertySelector(kAudioDevicePropertyMute),
-                mScope:AudioObjectPropertyScope(kAudioDevicePropertyScopeOutput),
-                mElement:1)
-            propsize = UInt32(MemoryLayout<UInt32>.size)
             
-            result = AudioObjectGetPropertyData(subDevice, &address, 0, nil, &propsize, &mute)
-            if (result != 0) {
-                print("kAudioDevicePropertyVolumeScalar volLeft result:\(result)")
-                exit(-1)
-            }
-            if (mute == 1) {
-                return true
-            }
-            
-            address = AudioObjectPropertyAddress(
-                mSelector:AudioObjectPropertySelector(kAudioDevicePropertyMute),
-                mScope:AudioObjectPropertyScope(kAudioDevicePropertyScopeOutput),
-                mElement:2)
-            propsize = UInt32(MemoryLayout<UInt32>.size)
-            result = AudioObjectGetPropertyData(subDevice, &address, 0, nil, &propsize, &mute)
-            if (result != 0) {
-                print("kAudioDevicePropertyVolumeScalar volRight result:\(result)")
-                exit(-1)
-            }
-            if (mute == 1) {
-                return true
+            for channel in channels {
+                address = AudioObjectPropertyAddress(
+                    mSelector:AudioObjectPropertySelector(kAudioDevicePropertyMute),
+                    mScope:AudioObjectPropertyScope(kAudioDevicePropertyScopeOutput),
+                    mElement:channel)
+                propsize = UInt32(MemoryLayout<UInt32>.size)
+                
+                result = AudioObjectGetPropertyData(subDevice, &address, 0, nil, &propsize, &mute)
+                if (result != 0) {
+                    print("kAudioDevicePropertyVolumeScalar channel:\(channel) result:\(result)")
+                    exit(-1)
+                }
+                if (mute == 1) {
+                    return true
+                }
             }
         }
         return false
@@ -210,28 +211,20 @@ class AggregateVolumeControl {
         var mut: UInt32 = (mute == true) ? 1 : 0
         for i in 0..<subDeviceCount {
             let subDevice:AudioDeviceID = subDevicesID[i]
+            let channels = getChannels(subDevice: subDevice)
             
-            address = AudioObjectPropertyAddress(
-                mSelector:AudioObjectPropertySelector(kAudioDevicePropertyMute),
-                mScope:AudioObjectPropertyScope(kAudioDevicePropertyScopeOutput),
-                mElement:1)
-            propsize = UInt32(MemoryLayout<UInt32>.size)
-            
-            result = AudioObjectSetPropertyData(subDevice, &address, 0, nil, propsize, &mut)
-            if (result != 0) {
-                print("kAudioDevicePropertyMute volLeft result:\(result)")
-                exit(-1)
-            }
-            
-            address = AudioObjectPropertyAddress(
-                mSelector:AudioObjectPropertySelector(kAudioDevicePropertyMute),
-                mScope:AudioObjectPropertyScope(kAudioDevicePropertyScopeOutput),
-                mElement:2)
-            propsize = UInt32(MemoryLayout<UInt32>.size)
-            result = AudioObjectSetPropertyData(subDevice, &address, 0, nil, propsize, &mut)
-            if (result != 0) {
-                print("kAudioDevicePropertyMute volRight result:\(result)")
-                exit(-1)
+            for channel in channels {
+                address = AudioObjectPropertyAddress(
+                    mSelector:AudioObjectPropertySelector(kAudioDevicePropertyMute),
+                    mScope:AudioObjectPropertyScope(kAudioDevicePropertyScopeOutput),
+                    mElement:channel)
+                propsize = UInt32(MemoryLayout<UInt32>.size)
+                
+                result = AudioObjectSetPropertyData(subDevice, &address, 0, nil, propsize, &mut)
+                if (result != 0) {
+                    print("kAudioDevicePropertyMute channel:\(channel) result:\(result)")
+                    exit(-1)
+                }
             }
         }
     }
