@@ -13,192 +13,231 @@ class AggregateVolumeControl {
     var propsize:UInt32 = 0;
     var result:OSStatus = 0;
     var audioDeviceID: AudioDeviceID = 0;
-    var audioDeviceUID:CFString? = nil;
     var subDeviceCount:Int = 0;
     var subDevicesID = [AudioDeviceID]()
     
     init() {
-        
-        // get default audio output device
+        // Get default audio output device
         address = AudioObjectPropertyAddress(
             mSelector:AudioObjectPropertySelector(kAudioHardwarePropertyDefaultOutputDevice),
             mScope:AudioObjectPropertyScope(kAudioObjectPropertyScopeGlobal),
-            mElement:AudioObjectPropertyElement(kAudioObjectPropertyElementMaster))
+            mElement:AudioObjectPropertyElement(kAudioObjectPropertyElementMain))
 
-        audioDeviceID = 0
         propsize = UInt32(MemoryLayout<AudioDeviceID>.size)
         result = AudioObjectGetPropertyData(AudioDeviceID(kAudioObjectSystemObject), &address, 0, nil, &propsize, &audioDeviceID)
 
         if (result != 0) {
-            print("kAudioHardwarePropertyDefaultOutputDevice result:\(result)")
+            print("Error: Could not get default output device. Result: \(result)")
             exit(-1)
         }
-
-        // get default audio output device uid
-        address = AudioObjectPropertyAddress(
-            mSelector:AudioObjectPropertySelector(kAudioDevicePropertyDeviceUID),
-            mScope:AudioObjectPropertyScope(kAudioObjectPropertyScopeGlobal),
-            mElement:AudioObjectPropertyElement(kAudioObjectPropertyElementMaster))
-
-        
-        propsize = UInt32(MemoryLayout<CFString?>.size)
-        result = AudioObjectGetPropertyData(audioDeviceID, &address, 0, nil, &propsize, &audioDeviceUID)
-
-        if (result != 0) {
-            print("kAudioDevicePropertyDeviceUID result:\(result)")
-            exit(-1)
-        }
-
-        // get default audio output device transport type
+    
+        // Check if the device is an Aggregate Device
         address = AudioObjectPropertyAddress(
             mSelector:AudioObjectPropertySelector(kAudioDevicePropertyTransportType),
             mScope:AudioObjectPropertyScope(kAudioObjectPropertyScopeGlobal),
-            mElement:AudioObjectPropertyElement(kAudioObjectPropertyElementMaster))
+            mElement:AudioObjectPropertyElement(kAudioObjectPropertyElementMain))
         var transportType:UInt32 = 0
         propsize = UInt32(MemoryLayout<UInt32>.size)
         result = AudioObjectGetPropertyData(audioDeviceID, &address, 0, nil, &propsize, &transportType)
 
         if (result != 0) {
-            print("kAudioDevicePropertyTransportType result:\(result)")
+            print("Error: Could not get transport type. Result: \(result)")
             exit(-1)
         }
 
-        // if transportType is not Aggregate then exit the tool
         if (transportType != kAudioDeviceTransportTypeAggregate) {
-            print("audioDeviceID: \(audioDeviceID) uid: \(audioDeviceUID as String? ?? "") transportType: \(transportType == kAudioDeviceTransportTypeAggregate)")
-            print("this tool only works with a kAudioDeviceTransportTypeAggregate result:\(result)")
+            print("This tool only works with an Aggregate Audio Device. The current default device is not an aggregate device.")
             exit(1)
         }
 
-        // get the sublist of the Aggregate Audio Device
+        // Get the sub-devices of the Aggregate Audio Device
         address = AudioObjectPropertyAddress(
             mSelector:AudioObjectPropertySelector(kAudioAggregateDevicePropertyActiveSubDeviceList),
             mScope:AudioObjectPropertyScope(kAudioObjectPropertyScopeGlobal),
-            mElement:AudioObjectPropertyElement(kAudioObjectPropertyElementMaster))
-        for _ in 0..<32 {
-            subDevicesID.append(AudioDeviceID())
-        }
-        propsize = UInt32(MemoryLayout<AudioDeviceID>.size * 32)
+            mElement:AudioObjectPropertyElement(kAudioObjectPropertyElementMain))
+        
+        // Pre-allocate a reasonably sized array for sub-device IDs
+        subDevicesID = [AudioDeviceID](repeating: 0, count: 32)
+        propsize = UInt32(MemoryLayout<AudioDeviceID>.size * subDevicesID.count)
+        
         result = AudioObjectGetPropertyData(audioDeviceID, &address, 0, nil, &propsize, &subDevicesID)
 
         if (result != 0) {
-            print("kAudioAggregateDevicePropertyActiveSubDeviceList result:\(result)")
+            print("Error: Could not get sub-device list. Result: \(result)")
             exit(-1)
         }
 
-        subDeviceCount = Int((propsize / UInt32(MemoryLayout<AudioDeviceID>.size)))
+        subDeviceCount = Int(propsize) / MemoryLayout<AudioDeviceID>.size
+        subDevicesID.removeSubrange(subDeviceCount..<subDevicesID.count) // Trim the array to the actual count
+        
+        debugDeviceInfo()
     }
     
-    func getChannels(subDevice: AudioDeviceID) -> [UInt32] {
-        var channelNumbers = [UInt32]()
+    func debugDeviceInfo() {
+        print("=== Aggregate Device Debug Info ===")
+        print("Main device ID: \(audioDeviceID)")
+        print("Sub-device count: \(subDeviceCount)")
         
-        for _ in 0..<32 {
-            channelNumbers.append(UInt32())
+        for (index, subDevice) in subDevicesID.enumerated() {
+            print("\nSub-device \(index): ID \(subDevice)")
+            
+            var deviceName: CFString = "" as CFString
+            var nameAddress = AudioObjectPropertyAddress(
+                mSelector: AudioObjectPropertySelector(kAudioDevicePropertyDeviceNameCFString),
+                mScope: AudioObjectPropertyScope(kAudioObjectPropertyScopeGlobal),
+                mElement: AudioObjectPropertyElement(kAudioObjectPropertyElementMain))
+            var nameSize = UInt32(MemoryLayout<CFString>.size)
+            
+            let result = withUnsafeMutablePointer(to: &deviceName) { pointer in
+                AudioObjectGetPropertyData(subDevice, &nameAddress, 0, nil, &nameSize, pointer)
+            }
+
+            if result == noErr {
+                print("  Name: \(deviceName as String)")
+            } else {
+                print("  Name: <Could not be retrieved>")
+            }
+            
+            let workingChannels = self.getWorkingChannels(subDevice: subDevice)
+            print("  Final working channels: \(workingChannels)")
+        }
+        print("=== End Debug Info ===\n")
+    }
+
+    func getWorkingChannels(subDevice: AudioDeviceID) -> [UInt32] {
+        var workingChannels: [UInt32] = []
+        
+        // Test a standard range of channels (e.g., Master, Left, Right)
+        let channelsToTest: [UInt32] = [0, 1, 2]
+        
+        for channel in channelsToTest {
+            var address = AudioObjectPropertyAddress(
+                mSelector: AudioObjectPropertySelector(kAudioDevicePropertyVolumeScalar),
+                mScope: AudioObjectPropertyScope(kAudioDevicePropertyScopeOutput),
+                mElement: channel)
+            
+            // Check if the device reports having a volume property on this channel
+            if AudioObjectHasProperty(subDevice, &address) {
+                // As a final confirmation, try to read the property's value
+                var testVol: Float = 0.0
+                var testSize = UInt32(MemoryLayout<Float>.size)
+                if AudioObjectGetPropertyData(subDevice, &address, 0, nil, &testSize, &testVol) == noErr {
+                    // print("Found working channel \(channel) for device \(subDevice)")
+                    workingChannels.append(channel) // Add the working channel to our list
+                }
+            }
         }
         
-        address = AudioObjectPropertyAddress(
-            mSelector:AudioObjectPropertySelector(kAudioDevicePropertyPreferredChannelsForStereo),
-            mScope:AudioObjectPropertyScope(kAudioDevicePropertyScopeOutput),
-            mElement:AudioObjectPropertyElement(kAudioObjectPropertyElementMaster))
-        
-        propsize = UInt32(MemoryLayout<UInt32>.size * 32)
-        result = AudioObjectGetPropertyData(subDevice, &address, 0, nil, &propsize, &channelNumbers)
-        if (result != 0) {
-            print("kAudioDevicePropertyPreferredChannelsForStereo result:\(result)")
-            exit(-1)
+        // **Optional Improvement**: Some devices have a master channel (0) and stereo channels (1, 2).
+        // In these cases, it's often best to control only the master channel.
+        if workingChannels.contains(0) && (workingChannels.contains(1) || workingChannels.contains(2)) {
+            print("Info: Found a master channel (0) alongside other channels. Preferring the master channel for control.")
+            return [0]
         }
         
-        if ((Int(propsize) / MemoryLayout<UInt32>.size) < 32) {
-            let range = (Int(propsize) / MemoryLayout<UInt32>.size)...31
-            channelNumbers.removeSubrange(range)
+        if workingChannels.isEmpty {
+            print("Warning: No working volume channels found for device \(subDevice)")
         }
-        return channelNumbers
+        
+        // Return the complete list of found channels
+        return workingChannels
     }
     
     func getVolume() -> Float {
-        var volAvg:Float = 0.0
+        var totalVolume: Float = 0.0
+        var controllableDeviceCount = 0
         
-        for i in 0..<subDeviceCount {
-            let subDevice:AudioDeviceID = subDevicesID[i]
-            let channels = getChannels(subDevice: subDevice)
+        for subDevice in subDevicesID {
+            let channels = self.getWorkingChannels(subDevice: subDevice)
+            if channels.isEmpty {
+                continue
+            }
             
-            var volSum: Float = 0.0
+            var channelVolume: Float = 0.0
+            var validChannelCount = 0
+            
             for channel in channels {
                 var vol: Float = 0.0
-                address = AudioObjectPropertyAddress(
+                var address = AudioObjectPropertyAddress(
                     mSelector:AudioObjectPropertySelector(kAudioDevicePropertyVolumeScalar),
                     mScope:AudioObjectPropertyScope(kAudioDevicePropertyScopeOutput),
                     mElement:channel)
-                propsize = UInt32(MemoryLayout<Float>.size)
+                var propsize = UInt32(MemoryLayout<Float>.size)
                 
-                result = AudioObjectGetPropertyData(subDevice, &address, 0, nil, &propsize, &vol)
-                if (result != 0) {
-                    print("kAudioDevicePropertyVolumeScalar channel:\(channel) result:\(result)")
-                    exit(-1)
+                let result = AudioObjectGetPropertyData(subDevice, &address, 0, nil, &propsize, &vol)
+                if result == noErr {
+                    channelVolume += vol
+                    validChannelCount += 1
                 }
-                
-                volSum += vol
             }
             
-            volAvg += volSum / Float(channels.count)
+            if validChannelCount > 0 {
+                totalVolume += (channelVolume / Float(validChannelCount))
+                controllableDeviceCount += 1
+            }
         }
 
-        volAvg = volAvg / Float(subDeviceCount)
-        return volAvg
+        if controllableDeviceCount > 0 {
+            return totalVolume / Float(controllableDeviceCount)
+        }
+        
+        print("Warning: No sub-devices support volume control.")
+        return 0.0
     }
     
-    func setVolume(volume:Float) {
+    func setVolume(volume: Float) {
+        let isMuted = getMute()
+        
+        // If unmuting, make sure to turn mute off
+        if isMuted && volume > 0 {
+            setMute(false)
+        }
+        
         var vol = volume
-        if (vol == 0) {
-            if (!getMute()) {
-                switchMute()
+        for subDevice in subDevicesID {
+            let channels = self.getWorkingChannels(subDevice: subDevice)
+            if channels.isEmpty {
+                continue
             }
-            return
-        }
-        if (getMute()) {
-            switchMute()
-        }
-        for i in 0..<subDeviceCount {
-            let subDevice:AudioDeviceID = subDevicesID[i]
-            let channels = getChannels(subDevice: subDevice)
             
             for channel in channels {
-                address = AudioObjectPropertyAddress(
+                var address = AudioObjectPropertyAddress(
                     mSelector:AudioObjectPropertySelector(kAudioDevicePropertyVolumeScalar),
                     mScope:AudioObjectPropertyScope(kAudioDevicePropertyScopeOutput),
                     mElement:channel)
-                propsize = UInt32(MemoryLayout<Float>.size)
+                let propsize = UInt32(MemoryLayout<Float>.size)
                 
-                result = AudioObjectSetPropertyData(subDevice, &address, 0, nil, propsize, &vol)
-                if (result != 0) {
-                    print("kAudioDevicePropertyVolumeScalar channel:\(channel) result:\(result)")
-                    exit(-1)
-                }
+                AudioObjectSetPropertyData(subDevice, &address, 0, nil, propsize, &vol)
             }
+        }
+        
+        // If volume is set to 0, also mute the device
+        if volume == 0.0 && !isMuted {
+            setMute(true)
         }
     }
     
     func getMute() -> Bool {
-        for i in 0..<subDeviceCount {
-            let subDevice:AudioDeviceID = subDevicesID[i]
-            let channels = getChannels(subDevice: subDevice)
-            
-            var mute:UInt32 = 0
+        for subDevice in subDevicesID {
+            let channels = self.getWorkingChannels(subDevice: subDevice)
+            if channels.isEmpty {
+                continue
+            }
             
             for channel in channels {
-                address = AudioObjectPropertyAddress(
+                var mute: UInt32 = 0
+                var address = AudioObjectPropertyAddress(
                     mSelector:AudioObjectPropertySelector(kAudioDevicePropertyMute),
                     mScope:AudioObjectPropertyScope(kAudioDevicePropertyScopeOutput),
                     mElement:channel)
-                propsize = UInt32(MemoryLayout<UInt32>.size)
+                var propsize = UInt32(MemoryLayout<UInt32>.size)
                 
-                result = AudioObjectGetPropertyData(subDevice, &address, 0, nil, &propsize, &mute)
-                if (result != 0) {
-                    print("kAudioDevicePropertyVolumeScalar channel:\(channel) result:\(result)")
-                    exit(-1)
-                }
-                if (mute == 1) {
-                    return true
+                // Only check mute status if the property exists
+                if AudioObjectHasProperty(subDevice, &address) {
+                    let result = AudioObjectGetPropertyData(subDevice, &address, 0, nil, &propsize, &mute)
+                    if result == noErr && mute == 1 {
+                        return true // If any controllable channel is muted, we consider it muted
+                    }
                 }
             }
         }
@@ -206,27 +245,33 @@ class AggregateVolumeControl {
     }
     
     func switchMute() {
-        let mute = !getMute()
+        let shouldMute = !getMute()
+        setMute(shouldMute)
+    }
+    
+    private func setMute(_ mute: Bool) {
+        var mut: UInt32 = mute ? 1 : 0
         
-        var mut: UInt32 = (mute == true) ? 1 : 0
-        for i in 0..<subDeviceCount {
-            let subDevice:AudioDeviceID = subDevicesID[i]
-            let channels = getChannels(subDevice: subDevice)
+        for subDevice in subDevicesID {
+            let channels = self.getWorkingChannels(subDevice: subDevice)
+            if channels.isEmpty {
+                continue
+            }
             
             for channel in channels {
-                address = AudioObjectPropertyAddress(
+                var address = AudioObjectPropertyAddress(
                     mSelector:AudioObjectPropertySelector(kAudioDevicePropertyMute),
                     mScope:AudioObjectPropertyScope(kAudioDevicePropertyScopeOutput),
                     mElement:channel)
-                propsize = UInt32(MemoryLayout<UInt32>.size)
                 
-                result = AudioObjectSetPropertyData(subDevice, &address, 0, nil, propsize, &mut)
-                if (result != 0) {
-                    print("kAudioDevicePropertyMute channel:\(channel) result:\(result)")
-                    exit(-1)
+                // Only try to set mute if the device supports it on this channel
+                if AudioObjectHasProperty(subDevice, &address) {
+                    let propsize = UInt32(MemoryLayout<UInt32>.size)
+                    AudioObjectSetPropertyData(subDevice, &address, 0, nil, propsize, &mut)
+                } else {
+                    print("Info: Channel \(channel) on device \(subDevice) does not support mute control.")
                 }
             }
         }
     }
 }
-
