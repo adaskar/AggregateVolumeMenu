@@ -12,13 +12,17 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     let statusItem = NSStatusBar.system.statusItem(withLength:NSStatusItem.squareLength)
     let popover = NSPopover()
+    let audioManager = AudioDeviceManager()
     
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         if let button = self.statusItem.button {
             button.image = NSImage(named: NSImage.Name("StatusIcon"))
             button.action = #selector(AppDelegate.togglePopover(_:))
         }
-        self.popover.contentViewController = ViewController.newInstance()
+        
+        let vc = ViewController.newInstance()
+        vc.audioManager = audioManager // Pass the shared instance
+        self.popover.contentViewController = vc
     }
     
     func applicationWillTerminate(_ aNotification: Notification) {
@@ -45,4 +49,3 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         self.popover.performClose(sender)
     }
 }
-

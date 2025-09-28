@@ -7,29 +7,99 @@
 
 import Cocoa
 
-class ViewController: NSViewController {
-    let avcControl = AggregateVolumeControl()
+class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelegate {
+    var audioManager: AudioDeviceManager!
+    private var devices: [AudioDevice] = []
     
-    @IBOutlet weak var hsVolume: NSSlider!
+    @IBOutlet weak var deviceTableView: NSTableView!
+    @IBOutlet weak var volumeSlider: NSSlider!
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        hsVolume.minValue = 0
-        hsVolume.maxValue = 1
-        hsVolume.isContinuous = false
-        hsVolume.floatValue = avcControl.getVolume()
+        
+        deviceTableView.dataSource = self
+        deviceTableView.delegate = self
+        deviceTableView.action = #selector(onDeviceSelected)
+        
+        volumeSlider.minValue = 0
+        volumeSlider.maxValue = 1
+        volumeSlider.isContinuous = true // Ensure slider updates while dragging
+        
+        // Listen for notifications when media keys change the volume
+        NotificationCenter.default.addObserver(self, selector: #selector(updateUI), name: .volumeChanged, object: nil)
     }
     
     override func viewWillAppear() {
-        hsVolume.floatValue = avcControl.getVolume()
+        super.viewWillAppear()
+        updateUI()
     }
-
-    override var representedObject: Any? {
-        didSet {
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    @objc private func updateUI() {
+        // Refresh device list
+        devices = audioManager.getOutputDevices()
+        deviceTableView.reloadData()
+        
+        // Select current default device
+        if let defaultDevice = audioManager.getDefaultOutputDevice(),
+           let rowIndex = devices.firstIndex(of: defaultDevice) {
+            deviceTableView.selectRowIndexes(IndexSet(integer: rowIndex), byExtendingSelection: false)
+            
+            // Update slider
+            if let volume = audioManager.getVolume(for: defaultDevice) {
+                volumeSlider.isEnabled = true
+                volumeSlider.floatValue = volume
+            } else {
+                volumeSlider.isEnabled = false
+            }
+        } else {
+            volumeSlider.isEnabled = false
         }
     }
-    @IBAction func hsVolumeChanged(_ sender: Any) {
-        avcControl.setVolume(volume: hsVolume.floatValue)
+    
+    @objc private func onDeviceSelected() {
+        let selectedRow = deviceTableView.selectedRow
+        guard selectedRow >= 0 else { return }
+        
+        let selectedDevice = devices[selectedRow]
+        audioManager.setDefaultOutputDevice(selectedDevice)
+        
+        // Update the volume slider for the newly selected device
+        if let volume = audioManager.getVolume(for: selectedDevice) {
+            volumeSlider.isEnabled = true
+            volumeSlider.floatValue = volume
+        } else {
+            volumeSlider.isEnabled = false
+        }
+    }
+    
+    @IBAction func volumeSliderChanged(_ sender: NSSlider) {
+        let selectedRow = deviceTableView.selectedRow
+        guard selectedRow >= 0 else { return }
+        
+        let selectedDevice = devices[selectedRow]
+        audioManager.setVolume(sender.floatValue, for: selectedDevice)
+    }
+    
+    // MARK: - TableView DataSource & Delegate
+    
+    func numberOfRows(in tableView: NSTableView) -> Int {
+        return devices.count
+    }
+    
+    func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
+        guard let cell = tableView.makeView(withIdentifier: NSUserInterfaceItemIdentifier(rawValue: "DeviceNameColumn"), owner: self) as? NSTableCellView else {
+            return nil
+        }
+        
+        if row < devices.count {
+            cell.textField?.stringValue = devices[row].name
+        }
+        
+        return cell
     }
     
     static func newInstance() -> ViewController {
@@ -43,4 +113,3 @@ class ViewController: NSViewController {
     }
 
 }
-

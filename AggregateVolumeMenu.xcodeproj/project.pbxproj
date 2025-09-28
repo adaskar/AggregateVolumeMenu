@@ -13,6 +13,8 @@
 		CABDF1202590FD57006F420A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CABDF11E2590FD57006F420A /* Main.storyboard */; };
 		CABDF13225911675006F420A /* MyApplication.swift in Sources */ = {isa = PBXBuildFile; fileRef = CABDF12E25911571006F420A /* MyApplication.swift */; };
 		CABDF136259138E8006F420A /* AggregateVolumeControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = CABDF135259138E8006F420A /* AggregateVolumeControl.swift */; };
+		CAF43D012E89C85A002EAABE /* AudioDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAF43CFF2E89C85A002EAABE /* AudioDevice.swift */; };
+		CAF43D022E89C85A002EAABE /* AudioDeviceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAF43D002E89C85A002EAABE /* AudioDeviceManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -25,6 +27,8 @@
 		CABDF1222590FD57006F420A /* AggregateVolumeMenu.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AggregateVolumeMenu.entitlements; sourceTree = "<group>"; };
 		CABDF12E25911571006F420A /* MyApplication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyApplication.swift; sourceTree = "<group>"; };
 		CABDF135259138E8006F420A /* AggregateVolumeControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AggregateVolumeControl.swift; sourceTree = "<group>"; };
+		CAF43CFF2E89C85A002EAABE /* AudioDevice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioDevice.swift; sourceTree = "<group>"; };
+		CAF43D002E89C85A002EAABE /* AudioDeviceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioDeviceManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -65,6 +69,8 @@
 				CABDF1212590FD57006F420A /* Info.plist */,
 				CABDF1222590FD57006F420A /* AggregateVolumeMenu.entitlements */,
 				CABDF135259138E8006F420A /* AggregateVolumeControl.swift */,
+				CAF43CFF2E89C85A002EAABE /* AudioDevice.swift */,
+				CAF43D002E89C85A002EAABE /* AudioDeviceManager.swift */,
 			);
 			path = AggregateVolumeMenu;
 			sourceTree = "<group>";
@@ -141,6 +147,8 @@
 			files = (
 				CABDF13225911675006F420A /* MyApplication.swift in Sources */,
 				CABDF11B2590FD56006F420A /* ViewController.swift in Sources */,
+				CAF43D012E89C85A002EAABE /* AudioDevice.swift in Sources */,
+				CAF43D022E89C85A002EAABE /* AudioDeviceManager.swift in Sources */,
 				CABDF1192590FD56006F420A /* AppDelegate.swift in Sources */,
 				CABDF136259138E8006F420A /* AggregateVolumeControl.swift in Sources */,
 			);
