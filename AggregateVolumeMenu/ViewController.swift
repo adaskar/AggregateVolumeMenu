@@ -20,6 +20,7 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
         deviceTableView.dataSource = self
         deviceTableView.delegate = self
         deviceTableView.action = #selector(onDeviceSelected)
+        deviceTableView.style = .sourceList
         
         volumeSlider.minValue = 0
         volumeSlider.maxValue = 1
@@ -74,6 +75,9 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
         } else {
             volumeSlider.isEnabled = false
         }
+        
+        // Reload the table to update the checkmark
+        deviceTableView.reloadData()
     }
     
     @IBAction func volumeSliderChanged(_ sender: NSSlider) {
@@ -91,13 +95,17 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
     }
     
     func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
-        guard let cell = tableView.makeView(withIdentifier: NSUserInterfaceItemIdentifier(rawValue: "DeviceNameColumn"), owner: self) as? NSTableCellView else {
+        guard let cell = tableView.makeView(withIdentifier: NSUserInterfaceItemIdentifier(rawValue: "DeviceNameColumn"), owner: self) as? NSTableCellView,
+              row < devices.count else {
             return nil
         }
         
-        if row < devices.count {
-            cell.textField?.stringValue = devices[row].name
-        }
+        let device = devices[row]
+        cell.textField?.stringValue = device.name
+        
+        let isSelectedDevice = (device == audioManager.getDefaultOutputDevice())
+        let checkmarkImage = isSelectedDevice ? NSImage(systemSymbolName: "checkmark", accessibilityDescription: "Selected") : nil
+        cell.imageView?.image = checkmarkImage
         
         return cell
     }

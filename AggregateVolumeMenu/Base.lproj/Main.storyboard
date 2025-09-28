@@ -55,10 +55,14 @@
                                                     <prototypeCellViews>
                                                         <tableCellView id="VqI-2f-90e">
                                                             <rect key="frame" x="1" y="1" width="275" height="17"/>
-                                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                                            <subviews>
+                                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>                                                            <subviews>
+                                                                <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fXg-b3-93t">
+                                                                    <rect key="frame" x="255" y="0.0" width="17" height="17"/>
+                                                                    <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
+                                                                    <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="NSActionTemplate" id="705-5g-22g"/>
+                                                                </imageView>
                                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="64h-8V-y3b">
-                                                                    <rect key="frame" x="0.0" y="0.0" width="275" height="17"/>
+                                                                    <rect key="frame" x="0.0" y="0.0" width="249" height="17"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                                                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Table View Cell" id="84Z-2c-0eF">
                                                                         <font key="font" metaFont="system"/>
@@ -68,6 +72,7 @@
                                                                 </textField>
                                                             </subviews>
                                                             <connections>
+                                                                <outlet property="imageView" destination="fXg-b3-93t" id="3h8-hC-c6P"/>
                                                                 <outlet property="textField" destination="64h-8V-y3b" id="45d-7a-9kU"/>
                                                             </connections>
                                                         </tableCellView>
@@ -100,7 +105,7 @@
                         </subviews>
                         <constraints>
                             <constraint firstItem="t1h-7d-n2M" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="33b-8N-e3K"/>
-                            <constraint firstItem="zHD-gy-Owv" firstAttribute="top" secondItem="t1h-7d-n2M" secondAttribute="bottom" constant="8" symbolic="YES" id="3h8-hC-c6P"/>
+                            <constraint firstItem="zHD-gy-Owv" firstAttribute="top" secondItem="t1h-7d-n2M" secondAttribute="bottom" constant="8" symbolic="YES" id="LzP-gV-4fA"/>
                             <constraint firstAttribute="trailing" secondItem="t1h-7d-n2M" secondAttribute="trailing" id="94c-e8-16e"/>
                             <constraint firstAttribute="bottom" secondItem="zHD-gy-Owv" secondAttribute="bottom" constant="11" id="G64-2e-33E"/>
                             <constraint firstItem="zHD-gy-Owv" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" constant="20" symbolic="YES" id="J3b-bM-6hN"/>

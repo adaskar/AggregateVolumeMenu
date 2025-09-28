@@ -8,7 +8,7 @@
 import Foundation
 import CoreAudio
 
-struct AudioDevice: Hashable {
+struct AudioDevice: Equatable, Hashable {
     let id: AudioDeviceID
     let name: String
 }
