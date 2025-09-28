@@ -26,10 +26,10 @@
                 <viewController storyboardIdentifier="ViewController" id="XfG-lQ-9wD" customClass="ViewController" customModule="AggregateVolumeMenu" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" misplaced="YES" id="m2S-Jp-Qdl">
                         <rect key="frame" x="0.0" y="0.0" width="280" height="180"/>
-                        <autoresizingMask key="autoresizingMask"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <subviews>
                             <scrollView autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="t1h-7d-n2M">
-                                <rect key="frame" x="0.0" y="40" width="280" height="140"/>
+                                <rect key="frame" x="0.0" y="0.0" width="280" height="125"/>
                                 <clipView key="contentView" id="e9h-5L-74b">
                                     <rect key="frame" x="1" y="1" width="278" height="138"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -96,21 +96,40 @@
                                 </tableHeaderView>
                             </scrollView>
                             <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="zHD-gy-Owv">
-                                <rect key="frame" x="18" y="9" width="244" height="24"/>
+                                <rect key="frame" x="18" y="131" width="244" height="24"/>
                                 <sliderCell key="cell" state="on" alignment="left" maxValue="1" doubleValue="0.5" tickMarkPosition="above" sliderType="linear" id="691-gH-37I"/>
                                 <connections>
                                     <action selector="volumeSliderChanged:" target="XfG-lQ-9wD" id="Kbs-Ca-rsP"/>
                                 </connections>
                             </slider>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="9eA-2e-u7M">
+                                <rect key="frame" x="18" y="159" width="41" height="16"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" title="Sound" id="e9b-9P-s8w">                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="p3X-vI-m4E">
+                                <rect key="frame" x="18" y="131" width="96" height="16"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" title="Output Devices" id="e0f-aG-gqL">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
                         </subviews>
                         <constraints>
-                            <constraint firstItem="t1h-7d-n2M" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="33b-8N-e3K"/>
-                            <constraint firstItem="zHD-gy-Owv" firstAttribute="top" secondItem="t1h-7d-n2M" secondAttribute="bottom" constant="8" symbolic="YES" id="LzP-gV-4fA"/>
+                            <constraint firstItem="9eA-2e-u7M" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" constant="11" id="13F-7y-g3f"/>
+                            <constraint firstItem="zHD-gy-Owv" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" constant="20" symbolic="YES" id="33b-8N-e3K"/>
+                            <constraint firstItem="p3X-vI-m4E" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" constant="11" id="24U-gK-444"/>
+                            <constraint firstItem="t1h-7d-n2M" firstAttribute="top" secondItem="p3X-vI-m4E" secondAttribute="bottom" constant="6" id="6lO-aE-33E"/>
                             <constraint firstAttribute="trailing" secondItem="t1h-7d-n2M" secondAttribute="trailing" id="94c-e8-16e"/>
-                            <constraint firstAttribute="bottom" secondItem="zHD-gy-Owv" secondAttribute="bottom" constant="11" id="G64-2e-33E"/>
-                            <constraint firstItem="zHD-gy-Owv" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" constant="20" symbolic="YES" id="J3b-bM-6hN"/>
+                            <constraint firstItem="9eA-2e-u7M" firstAttribute="top" secondItem="m2S-Jp-Qdl" secondAttribute="top" constant="11" id="G64-2e-33E"/>
+                            <constraint firstItem="t1h-7d-n2M" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="J3b-bM-6hN"/>
+                            <constraint firstAttribute="bottom" secondItem="t1h-7d-n2M" secondAttribute="bottom" id="LzP-gV-4fA"/>
                             <constraint firstAttribute="trailing" secondItem="zHD-gy-Owv" secondAttribute="trailing" constant="20" symbolic="YES" id="a3x-2z-c1b"/>
-                            <constraint firstItem="t1h-7d-n2M" firstAttribute="top" secondItem="m2S-Jp-Qdl" secondAttribute="top" id="q8d-fA-h9c"/>
+                            <constraint firstItem="zHD-gy-Owv" firstAttribute="top" secondItem="9eA-2e-u7M" secondAttribute="bottom" constant="4" id="q8d-fA-h9c"/>
+                            <constraint firstItem="p3X-vI-m4E" firstAttribute="top" secondItem="zHD-gy-Owv" secondAttribute="bottom" constant="12" id="y0g-aE-33E"/>
                         </constraints>
                     </view>
                     <connections>

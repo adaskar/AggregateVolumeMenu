@@ -21,6 +21,13 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
         deviceTableView.delegate = self
         deviceTableView.action = #selector(onDeviceSelected)
         deviceTableView.style = .sourceList
+        // Hide the table header to create a seamless look
+        deviceTableView.headerView = nil
+        
+        // Make the table view background transparent
+        deviceTableView.backgroundColor = .clear
+        // Make the enclosing scroll view transparent as well
+        deviceTableView.enclosingScrollView?.drawsBackground = false
         
         volumeSlider.minValue = 0
         volumeSlider.maxValue = 1
@@ -65,13 +72,13 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
         
         let selectedDevice = devices[selectedRow]
         audioManager.setDefaultOutputDevice(selectedDevice)
+        // Reload the table to update the checkmark *before* deselecting
+        deviceTableView.reloadData()
         
         // Update the volume slider for the newly selected device
         if let volume = audioManager.getVolume(for: selectedDevice) {
             volumeSlider.isEnabled = true
             volumeSlider.floatValue = volume
-        } else {
-            volumeSlider.isEnabled = false
         }
         
         // Reload the table to update the checkmark
@@ -79,6 +86,10 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
         
         // Deselect the row to remove the highlight
         deviceTableView.deselectRow(selectedRow)
+
+        // The slider should always be enabled if there's a default device
+        // with volume control. This is handled by updateUI, but we can be explicit.
+        volumeSlider.isEnabled = audioManager.getVolume(for: selectedDevice) != nil
     }
     
     @IBAction func volumeSliderChanged(_ sender: NSSlider) {
