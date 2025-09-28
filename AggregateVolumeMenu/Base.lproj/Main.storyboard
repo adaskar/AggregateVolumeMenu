@@ -99,14 +99,14 @@
                                 </connections>
                             </slider>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="9eA-2e-u7M">
-                                <rect key="frame" x="18" y="159" width="41" height="16"/>
+                                <rect key="frame" x="18" y="158" width="41" height="16"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Sound" id="e9b-9P-s8w">                                    <font key="font" metaFont="system"/>
                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="p3X-vI-m4E">
-                                <rect key="frame" x="18" y="131" width="96" height="16"/>
+                                <rect key="frame" x="18" y="110" width="96" height="16"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Output Devices" id="e0f-aG-gqL">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -114,7 +114,7 @@
                                 </textFieldCell>
                             </textField>
                             <box boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="W0M-3v-f3o">
-                                <rect key="frame" x="20" y="153" width="240" height="5"/>
+                                <rect key="frame" x="20" y="131" width="240" height="5"/>
                             </box>
                         </subviews>
                         <constraints>
@@ -124,14 +124,14 @@
                             <constraint firstItem="t1h-7d-n2M" firstAttribute="top" secondItem="p3X-vI-m4E" secondAttribute="bottom" constant="8" symbolic="YES" id="6lO-aE-33E"/>
                             <constraint firstAttribute="trailing" secondItem="t1h-7d-n2M" secondAttribute="trailing" id="94c-e8-16e"/>
                             <constraint firstItem="9eA-2e-u7M" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" constant="20" id="A3F-7y-g3f"/>
-                            <constraint firstItem="9eA-2e-u7M" firstAttribute="top" secondItem="m2S-Jp-Qdl" secondAttribute="top" constant="5" id="G64-2e-33E"/>
+                            <constraint firstItem="9eA-2e-u7M" firstAttribute="top" secondItem="m2S-Jp-Qdl" secondAttribute="top" constant="12" id="G64-2e-33E"/>
                             <constraint firstItem="t1h-7d-n2M" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="J3b-bM-6hN"/>
                             <constraint firstAttribute="bottom" secondItem="t1h-7d-n2M" secondAttribute="bottom" id="LzP-gV-4fA"/>
                             <constraint firstAttribute="trailing" secondItem="zHD-gy-Owv" secondAttribute="trailing" constant="20" symbolic="YES" id="a3x-2z-c1b"/>
                             <constraint firstItem="zHD-gy-Owv" firstAttribute="top" secondItem="9eA-2e-u7M" secondAttribute="bottom" constant="8" symbolic="YES" id="q8d-fA-h9c"/>
                             <constraint firstAttribute="trailing" secondItem="W0M-3v-f3o" secondAttribute="trailing" constant="20" symbolic="YES" id="s0s-bC-g2T"/>
-                            <constraint firstItem="p3X-vI-m4E" firstAttribute="top" secondItem="W0M-3v-f3o" secondAttribute="bottom" constant="8" symbolic="YES" id="t9e-oG-e33"/>
-                            <constraint firstItem="W0M-3v-f3o" firstAttribute="top" secondItem="zHD-gy-Owv" secondAttribute="bottom" constant="8" symbolic="YES" id="y0g-aE-33E"/>
+                            <constraint firstItem="p3X-vI-m4E" firstAttribute="top" secondItem="W0M-3v-f3o" secondAttribute="bottom" constant="12" id="t9e-oG-e33"/>
+                            <constraint firstItem="W0M-3v-f3o" firstAttribute="top" secondItem="zHD-gy-Owv" secondAttribute="bottom" constant="12" id="y0g-aE-33E"/>
                         </constraints>
                     </view>
                     <connections>
