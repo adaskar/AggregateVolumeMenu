@@ -46,9 +46,7 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
         
         // Select current default device
         if let defaultDevice = audioManager.getDefaultOutputDevice(),
-           let rowIndex = devices.firstIndex(of: defaultDevice) {
-            deviceTableView.selectRowIndexes(IndexSet(integer: rowIndex), byExtendingSelection: false)
-            
+           let _ = devices.firstIndex(of: defaultDevice) {
             // Update slider
             if let volume = audioManager.getVolume(for: defaultDevice) {
                 volumeSlider.isEnabled = true
@@ -78,14 +76,16 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
         
         // Reload the table to update the checkmark
         deviceTableView.reloadData()
+        
+        // Deselect the row to remove the highlight
+        deviceTableView.deselectRow(selectedRow)
     }
     
     @IBAction func volumeSliderChanged(_ sender: NSSlider) {
-        let selectedRow = deviceTableView.selectedRow
-        guard selectedRow >= 0 else { return }
-        
-        let selectedDevice = devices[selectedRow]
-        audioManager.setVolume(sender.floatValue, for: selectedDevice)
+        // The slider should always control the default output device,
+        // which is indicated by the checkmark.
+        guard let defaultDevice = audioManager.getDefaultOutputDevice() else { return }
+        audioManager.setVolume(sender.floatValue, for: defaultDevice)
     }
     
     // MARK: - TableView DataSource & Delegate
