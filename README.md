@@ -15,7 +15,8 @@ If you use an Aggregate Audio Device on macOS or have multiple audio outputs (li
 
 ## Screenshot
 
-*(A screenshot of the menu in action would go here)*
+<img width="570" height="452" alt="image" src="https://github.com/user-attachments/assets/4f68dc46-7ab8-4ee2-ac0a-e24d1bf2e2df" />
+
 
 ## Getting Started
 
