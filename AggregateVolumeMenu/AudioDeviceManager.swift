@@ -7,6 +7,7 @@
 
 import Foundation
 import CoreAudio
+import SwiftUI
 
 /// Helper to create a FourCharCode from a 4-character String.
 private func fourCharCode(fromString string: String) -> FourCharCode {
@@ -20,9 +21,79 @@ private func fourCharCode(fromString string: String) -> FourCharCode {
 
 let kAudioHardwareServiceDeviceProperty_VirtualMainVolume = AudioObjectPropertySelector(fourCharCode(fromString: "vvol"))
 
-class AudioDeviceManager {
+class AudioDeviceManager: ObservableObject {
+    static let shared = AudioDeviceManager()
 
-    func getOutputDevices() -> [AudioDevice] {
+    @Published var outputDevices: [AudioDevice] = []
+    @Published var currentDevice: AudioDevice?
+    @Published var currentVolume: Float = 0.0
+    @Published var isMuted: Bool = false
+
+    private init() {
+        refreshDevices()
+        refreshCurrentDevice()
+    }
+    
+    deinit {
+        // CoreAudio listener'ları temizle (eğer eklenirse)
+    }
+    
+    static func getVolumeIcon(for volume: Float, isMuted: Bool) -> String {
+        if isMuted || volume == 0 {
+            return "speaker.slash.fill"
+        }
+        
+        switch volume {
+        case 0..<0.33:
+            return "speaker.wave.1.fill"
+        case 0.33..<0.66:
+            return "speaker.wave.2.fill"
+        case 0.66...1.0:
+            return "speaker.wave.3.fill"
+        default:
+            return "speaker.wave.2.fill"
+        }
+    }
+
+    func refreshDevices() {
+        outputDevices = getOutputDevices()
+    }
+
+    func refreshCurrentDevice() {
+        currentDevice = getDefaultOutputDevice()
+        if let device = currentDevice {
+            currentVolume = getVolume(for: device) ?? 0.0
+            isMuted = getMute(for: device) ?? false
+        }
+    }
+
+    func selectDevice(_ device: AudioDevice) {
+        setDefaultOutputDevice(device)
+        currentDevice = device
+        currentVolume = getVolume(for: device) ?? 0.0
+        isMuted = getMute(for: device) ?? false
+    }
+
+    func setCurrentVolume(_ volume: Float) {
+        guard let device = currentDevice else { return }
+        currentVolume = max(0, min(1, volume))
+        setVolume(currentVolume, for: device)
+    }
+
+    func adjustVolume(by delta: Float) {
+        guard let device = currentDevice else { return }
+        let newVolume = max(0, min(1, currentVolume + delta))
+        currentVolume = newVolume
+        setVolume(newVolume, for: device)
+    }
+
+    func toggleMute() {
+        guard let device = currentDevice else { return }
+        isMuted.toggle()
+        setMute(isMuted, for: device)
+    }
+
+    private func getOutputDevices() -> [AudioDevice] {
         var devices = [AudioDevice]()
 
         var address = AudioObjectPropertyAddress(
@@ -78,7 +149,7 @@ class AudioDeviceManager {
         return devices
     }
 
-    func getDefaultOutputDevice() -> AudioDevice? {
+    private func getDefaultOutputDevice() -> AudioDevice? {
         var deviceID: AudioDeviceID = 0
         var propsize = UInt32(MemoryLayout<AudioDeviceID>.size)
         var address = AudioObjectPropertyAddress(
@@ -94,7 +165,7 @@ class AudioDeviceManager {
         return getOutputDevices().first { $0.id == deviceID }
     }
 
-    func setDefaultOutputDevice(_ device: AudioDevice) {
+    private func setDefaultOutputDevice(_ device: AudioDevice) {
         var deviceID = device.id
         let propsize = UInt32(MemoryLayout<AudioDeviceID>.size)
         var address = AudioObjectPropertyAddress(
@@ -123,7 +194,7 @@ class AudioDeviceManager {
         return nil
     }
 
-    func getVolume(for device: AudioDevice) -> Float? {
+    private func getVolume(for device: AudioDevice) -> Float? {
         var volume: Float = 0.0
         var address = AudioObjectPropertyAddress(
             mSelector: kAudioHardwareServiceDeviceProperty_VirtualMainVolume,
@@ -160,7 +231,7 @@ class AudioDeviceManager {
         return result == noErr ? volume : nil
     }
 
-    func setVolume(_ volume: Float, for device: AudioDevice) {
+    private func setVolume(_ volume: Float, for device: AudioDevice) {
         var newVolume = volume
         var address = AudioObjectPropertyAddress(
             mSelector: kAudioHardwareServiceDeviceProperty_VirtualMainVolume,
@@ -202,7 +273,7 @@ class AudioDeviceManager {
         }
     }
     
-    func setMute(_ isMuted: Bool, for device: AudioDevice) {
+    private func setMute(_ isMuted: Bool, for device: AudioDevice) {
         var muteVal: UInt32 = isMuted ? 1 : 0
         var address = AudioObjectPropertyAddress(
             mSelector: kAudioDevicePropertyMute,
@@ -215,7 +286,7 @@ class AudioDeviceManager {
         }
     }
     
-    func getMute(for device: AudioDevice) -> Bool? {
+    private func getMute(for device: AudioDevice) -> Bool? {
         var muteVal: UInt32 = 0
         var address = AudioObjectPropertyAddress(
             mSelector: kAudioDevicePropertyMute,

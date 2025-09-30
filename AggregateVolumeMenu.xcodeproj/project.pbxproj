@@ -7,24 +7,20 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		CABDF1192590FD56006F420A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CABDF1182590FD56006F420A /* AppDelegate.swift */; };
-		CABDF11B2590FD56006F420A /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CABDF11A2590FD56006F420A /* ViewController.swift */; };
+		018ECBF22E8C382400210E72 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 018ECBF12E8C382000210E72 /* ContentView.swift */; };
+		018ECBF62E8C3A8600210E72 /* AggregateVolumeMenuApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 018ECBF52E8C3A8000210E72 /* AggregateVolumeMenuApp.swift */; };
 		CABDF11D2590FD57006F420A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CABDF11C2590FD57006F420A /* Assets.xcassets */; };
-		CABDF1202590FD57006F420A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CABDF11E2590FD57006F420A /* Main.storyboard */; };
-		CABDF13225911675006F420A /* MyApplication.swift in Sources */ = {isa = PBXBuildFile; fileRef = CABDF12E25911571006F420A /* MyApplication.swift */; };
 		CAF43D012E89C85A002EAABE /* AudioDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAF43CFF2E89C85A002EAABE /* AudioDevice.swift */; };
 		CAF43D022E89C85A002EAABE /* AudioDeviceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAF43D002E89C85A002EAABE /* AudioDeviceManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		018ECBF12E8C382000210E72 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		018ECBF52E8C3A8000210E72 /* AggregateVolumeMenuApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AggregateVolumeMenuApp.swift; sourceTree = "<group>"; };
 		CABDF1152590FD56006F420A /* AggregateVolumeMenu.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AggregateVolumeMenu.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		CABDF1182590FD56006F420A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		CABDF11A2590FD56006F420A /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		CABDF11C2590FD57006F420A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		CABDF11F2590FD57006F420A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		CABDF1212590FD57006F420A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		CABDF1222590FD57006F420A /* AggregateVolumeMenu.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AggregateVolumeMenu.entitlements; sourceTree = "<group>"; };
-		CABDF12E25911571006F420A /* MyApplication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyApplication.swift; sourceTree = "<group>"; };
 		CAF43CFF2E89C85A002EAABE /* AudioDevice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioDevice.swift; sourceTree = "<group>"; };
 		CAF43D002E89C85A002EAABE /* AudioDeviceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioDeviceManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -59,15 +55,13 @@
 		CABDF1172590FD56006F420A /* AggregateVolumeMenu */ = {
 			isa = PBXGroup;
 			children = (
-				CABDF12E25911571006F420A /* MyApplication.swift */,
-				CABDF1182590FD56006F420A /* AppDelegate.swift */,
-				CABDF11A2590FD56006F420A /* ViewController.swift */,
-				CABDF11C2590FD57006F420A /* Assets.xcassets */,
-				CABDF11E2590FD57006F420A /* Main.storyboard */,
-				CABDF1212590FD57006F420A /* Info.plist */,
-				CABDF1222590FD57006F420A /* AggregateVolumeMenu.entitlements */,
+				018ECBF52E8C3A8000210E72 /* AggregateVolumeMenuApp.swift */,
+				018ECBF12E8C382000210E72 /* ContentView.swift */,
 				CAF43CFF2E89C85A002EAABE /* AudioDevice.swift */,
 				CAF43D002E89C85A002EAABE /* AudioDeviceManager.swift */,
+				CABDF11C2590FD57006F420A /* Assets.xcassets */,
+				CABDF1212590FD57006F420A /* Info.plist */,
+				CABDF1222590FD57006F420A /* AggregateVolumeMenu.entitlements */,
 			);
 			path = AggregateVolumeMenu;
 			sourceTree = "<group>";
@@ -131,7 +125,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				CABDF11D2590FD57006F420A /* Assets.xcassets in Resources */,
-				CABDF1202590FD57006F420A /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -142,26 +135,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CABDF13225911675006F420A /* MyApplication.swift in Sources */,
-				CABDF11B2590FD56006F420A /* ViewController.swift in Sources */,
+				018ECBF22E8C382400210E72 /* ContentView.swift in Sources */,
 				CAF43D012E89C85A002EAABE /* AudioDevice.swift in Sources */,
 				CAF43D022E89C85A002EAABE /* AudioDeviceManager.swift in Sources */,
-				CABDF1192590FD56006F420A /* AppDelegate.swift in Sources */,
+				018ECBF62E8C3A8600210E72 /* AggregateVolumeMenuApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXVariantGroup section */
-		CABDF11E2590FD57006F420A /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				CABDF11F2590FD57006F420A /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
-/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		CABDF1232590FD57006F420A /* Debug */ = {
@@ -293,7 +274,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = 646A6XRW95;
+				DEVELOPMENT_TEAM = L4F45TBN2F;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				INFOPLIST_FILE = AggregateVolumeMenu/Info.plist;
@@ -317,7 +298,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = 646A6XRW95;
+				DEVELOPMENT_TEAM = L4F45TBN2F;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				INFOPLIST_FILE = AggregateVolumeMenu/Info.plist;
