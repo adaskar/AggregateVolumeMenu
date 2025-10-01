@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		018ECBF22E8C382400210E72 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 018ECBF12E8C382000210E72 /* ContentView.swift */; };
 		018ECBF62E8C3A8600210E72 /* AggregateVolumeMenuApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 018ECBF52E8C3A8000210E72 /* AggregateVolumeMenuApp.swift */; };
+		01D8DA5B2E8C716500B05A3A /* RiveRuntime in Frameworks */ = {isa = PBXBuildFile; productRef = 01D8DA5A2E8C716500B05A3A /* RiveRuntime */; };
+		01D8DA5F2E8C73F700B05A3A /* cat.riv in Resources */ = {isa = PBXBuildFile; fileRef = 01D8DA5E2E8C73F700B05A3A /* cat.riv */; };
 		CABDF11D2590FD57006F420A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CABDF11C2590FD57006F420A /* Assets.xcassets */; };
 		CAF43D012E89C85A002EAABE /* AudioDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAF43CFF2E89C85A002EAABE /* AudioDevice.swift */; };
 		CAF43D022E89C85A002EAABE /* AudioDeviceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAF43D002E89C85A002EAABE /* AudioDeviceManager.swift */; };
@@ -17,6 +19,7 @@
 /* Begin PBXFileReference section */
 		018ECBF12E8C382000210E72 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		018ECBF52E8C3A8000210E72 /* AggregateVolumeMenuApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AggregateVolumeMenuApp.swift; sourceTree = "<group>"; };
+		01D8DA5E2E8C73F700B05A3A /* cat.riv */ = {isa = PBXFileReference; lastKnownFileType = file; path = cat.riv; sourceTree = "<group>"; };
 		CABDF1152590FD56006F420A /* AggregateVolumeMenu.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AggregateVolumeMenu.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CABDF11C2590FD57006F420A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		CABDF1212590FD57006F420A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -30,6 +33,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				01D8DA5B2E8C716500B05A3A /* RiveRuntime in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -62,6 +66,7 @@
 				CABDF11C2590FD57006F420A /* Assets.xcassets */,
 				CABDF1212590FD57006F420A /* Info.plist */,
 				CABDF1222590FD57006F420A /* AggregateVolumeMenu.entitlements */,
+				01D8DA5E2E8C73F700B05A3A /* cat.riv */,
 			);
 			path = AggregateVolumeMenu;
 			sourceTree = "<group>";
@@ -110,6 +115,9 @@
 				Base,
 			);
 			mainGroup = CABDF10C2590FD56006F420A;
+			packageReferences = (
+				01D8DA592E8C716500B05A3A /* XCRemoteSwiftPackageReference "rive-ios" */,
+			);
 			productRefGroup = CABDF1162590FD56006F420A /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -125,6 +133,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				CABDF11D2590FD57006F420A /* Assets.xcassets in Resources */,
+				01D8DA5F2E8C73F700B05A3A /* cat.riv in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -336,6 +345,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		01D8DA592E8C716500B05A3A /* XCRemoteSwiftPackageReference "rive-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/rive-app/rive-ios";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 6.11.4;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		01D8DA5A2E8C716500B05A3A /* RiveRuntime */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 01D8DA592E8C716500B05A3A /* XCRemoteSwiftPackageReference "rive-ios" */;
+			productName = RiveRuntime;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = CABDF10D2590FD56006F420A /* Project object */;
 }

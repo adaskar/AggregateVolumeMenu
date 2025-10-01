@@ -6,27 +6,31 @@
 //
 
 import SwiftUI
+import RiveRuntime
 
 struct ContentView: View {
     @ObservedObject private var audioManager = AudioDeviceManager.shared
     @State private var isHoveringSlider = false
     @State private var hoveredDevice: AudioDevice?
-
+    @State private var mouseLocation: CGPoint = .zero
+    @StateObject private var riveViewModel = RiveViewModel(fileName: "cat", stateMachineName: "State Machine 1")
+    
     var volumePercentage: Int {
         Int(audioManager.currentVolume * 100)
     }
-
+    
     func adjustVolumeByStep(_ delta: Float) {
         audioManager.adjustVolume(by: delta)
     }
-
+    
     var volumeIcon: String {
         AudioDeviceManager.getVolumeIcon(for: audioManager.currentVolume,
                                          isMuted: audioManager.isMuted)
     }
-
+    
     var body: some View {
-        VStack(spacing: 0) {
+        GeometryReader { geometry in
+            VStack(spacing: 0) {
             // Header with Volume Control
             VStack(spacing: 16) {
                 // Current Device Display
@@ -35,13 +39,13 @@ struct ContentView: View {
                         Image(systemName: "hifispeaker.2.fill")
                             .foregroundColor(.accentColor)
                             .font(.system(size: 14))
-
+                        
                         Text(currentDevice.name)
                             .font(.system(size: 13, weight: .medium))
                             .lineLimit(1)
-
+                        
                         Spacer()
-
+                        
                         Text("\(volumePercentage)%")
                             .font(.system(size: 11, weight: .semibold, design: .rounded))
                             .foregroundColor(.secondary)
@@ -53,7 +57,7 @@ struct ContentView: View {
                     .padding(.horizontal, 16)
                     .padding(.top, 16)
                 }
-
+                
                 // Volume Slider Section
                 VStack(spacing: 12) {
                     HStack(spacing: 12) {
@@ -66,7 +70,7 @@ struct ContentView: View {
                         }
                         .buttonStyle(.plain)
                         .help(audioManager.isMuted ? "Unmute" : "Mute")
-
+                        
                         // Volume Slider
                         GeometryReader { geometry in
                             ZStack(alignment: .leading) {
@@ -74,12 +78,12 @@ struct ContentView: View {
                                 RoundedRectangle(cornerRadius: 4)
                                     .fill(Color.primary.opacity(0.1))
                                     .frame(height: 6)
-
+                                
                                 // Filled Track
                                 RoundedRectangle(cornerRadius: 4)
                                     .fill(audioManager.isMuted ? Color.red.opacity(0.5) : Color.accentColor)
                                     .frame(width: geometry.size.width * CGFloat(audioManager.currentVolume), height: 6)
-
+                                
                                 // Slider Thumb
                                 Circle()
                                     .fill(audioManager.isMuted ? Color.red : Color.accentColor)
@@ -101,7 +105,7 @@ struct ContentView: View {
                             )
                         }
                         .frame(height: 20)
-
+                        
                         // Max Volume Icon
                         Image(systemName: "speaker.wave.3.fill")
                             .font(.system(size: 16))
@@ -113,52 +117,79 @@ struct ContentView: View {
                 .padding(.bottom, 16)
             }
             .background(Color(NSColor.controlBackgroundColor).opacity(0.5))
-
+            
             Divider()
-
+            
             // Devices List Section
-            VStack(alignment: .leading, spacing: 0) {
-                HStack {
-                    Label("Output Devices", systemImage: "speaker.wave.2")
-                        .font(.system(size: 12, weight: .semibold))
-                        .foregroundColor(.secondary)
+            ZStack(alignment: .bottomLeading) {
+                VStack(alignment: .leading, spacing: 0) {
+                    HStack {
+                        Label("Output Devices", systemImage: "speaker.wave.2")
+                            .font(.system(size: 12, weight: .semibold))
+                            .foregroundColor(.secondary)
 
-                    Spacer()
+                        Spacer()
 
-                    Text("\(audioManager.outputDevices.count)")
-                        .font(.system(size: 11, weight: .medium))
-                        .foregroundColor(.secondary)
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 2)
-                        .background(Color.secondary.opacity(0.15))
-                        .cornerRadius(4)
-                }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 10)
+                        Text("\(audioManager.outputDevices.count)")
+                            .font(.system(size: 11, weight: .medium))
+                            .foregroundColor(.secondary)
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 2)
+                            .background(Color.secondary.opacity(0.15))
+                            .cornerRadius(4)
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 10)
 
-                // Devices List
-                ScrollView {
-                    VStack(spacing: 1) {
-                        ForEach(audioManager.outputDevices, id: \.id) { device in
-                            DeviceRow(
-                                device: device,
-                                isSelected: device == audioManager.currentDevice,
-                                isHovered: hoveredDevice == device,
-                                action: {
-                                    audioManager.selectDevice(device)
+                    // Devices List
+                    ScrollView {
+                        VStack(spacing: 1) {
+                            ForEach(audioManager.outputDevices, id: \.id) { device in
+                                DeviceRow(
+                                    device: device,
+                                    isSelected: device == audioManager.currentDevice,
+                                    isHovered: hoveredDevice == device,
+                                    action: {
+                                        audioManager.selectDevice(device)
+                                    }
+                                )
+                                .onHover { hovering in
+                                    hoveredDevice = hovering ? device : nil
                                 }
-                            )
-                            .onHover { hovering in
-                                hoveredDevice = hovering ? device : nil
                             }
                         }
+                        .padding(.bottom, 8)
                     }
-                    .padding(.bottom, 8)
                 }
             }
         }
         .frame(width: 320, height: 420)
         .background(VisualEffectView())
+        .overlay(
+            // Rive animation as overlay covering entire window for mouse tracking
+            ZStack {
+                riveViewModel.view()
+                    .frame(width: 320, height: 420) // Full window size for mouse tracking
+                    .scaleEffect(0.4, anchor: .bottomLeading) // Scale down visually
+                    .allowsHitTesting(true) // Allow mouse interaction
+                    .opacity(1.0)
+
+                // Transparent overlay to ensure other UI elements remain interactive
+                Color.clear
+                    .frame(width: 320, height: 420)
+                    .allowsHitTesting(false)
+            }
+            .frame(width: 320, height: 420)
+        )
+        .onContinuousHover { phase in
+            switch phase {
+            case .active(let location):
+                mouseLocation = location
+            case .ended:
+                break
+            }
+        }
+        }
         .onAppear {
             audioManager.refreshDevices()
             audioManager.refreshCurrentDevice()
@@ -197,10 +228,10 @@ struct DeviceRow: View {
     let isSelected: Bool
     let isHovered: Bool
     let action: () -> Void
-
+    
     private var deviceIcon: String {
         let lowercasedName = device.name.lowercased()
-
+        
         if lowercasedName.contains("airpods") {
             return "airpodspro"
         } else if lowercasedName.contains("headphone") {
@@ -219,7 +250,7 @@ struct DeviceRow: View {
             return "hifispeaker"
         }
     }
-
+    
     var body: some View {
         Button(action: action) {
             HStack(spacing: 12) {
@@ -228,7 +259,7 @@ struct DeviceRow: View {
                     Circle()
                         .fill(isSelected ? Color.accentColor : Color.clear)
                         .frame(width: 20, height: 20)
-
+                    
                     if isSelected {
                         Image(systemName: "checkmark")
                             .font(.system(size: 10, weight: .bold))
@@ -239,28 +270,28 @@ struct DeviceRow: View {
                             .frame(width: 20, height: 20)
                     }
                 }
-
+                
                 // Device Icon
                 Image(systemName: deviceIcon)
                     .font(.system(size: 16))
                     .frame(width: 24)
-
+                
                 // Device Name
                 VStack(alignment: .leading, spacing: 2) {
                     Text(device.name)
                         .font(.system(size: 13, weight: isSelected ? .medium : .regular))
                         .foregroundColor(isSelected ? .primary : .primary.opacity(0.9))
                         .lineLimit(1)
-
+                    
                     if isSelected {
                         Text("Active")
                             .font(.system(size: 10))
                             .foregroundColor(.blue)
                     }
                 }
-
+                
                 Spacer()
-
+                
                 // Connected indicator
                 if isSelected {
                     Image(systemName: "dot.radiowaves.left.and.right")
@@ -288,7 +319,7 @@ struct VisualEffectView: NSViewRepresentable {
         view.state = .active
         return view
     }
-
+    
     func updateNSView(_ nsView: NSVisualEffectView, context: Context) {}
 }
 
