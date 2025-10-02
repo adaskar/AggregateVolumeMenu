@@ -68,17 +68,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         button.imagePosition = .imageOnly
         
         updateTooltip(button: button, volume: volumePercentage, isMuted: isMuted)
-        
-        if isMuted {
-            button.contentTintColor = NSColor.systemRed
-            button.alphaValue = 0.9
-        } else if volume == 0 {
-            button.contentTintColor = NSColor.systemGray
-            button.alphaValue = 0.7
-        } else {
-            button.contentTintColor = nil
-            button.alphaValue = 1.0
-        }
     }
 
     private func updateTooltip(button: NSButton, volume: Int, isMuted: Bool) {

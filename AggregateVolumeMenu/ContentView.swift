@@ -12,7 +12,6 @@ struct ContentView: View {
     @ObservedObject private var audioManager = AudioDeviceManager.shared
     @State private var isHoveringSlider = false
     @State private var hoveredDevice: AudioDevice?
-    @State private var mouseLocation: CGPoint = .zero
     @StateObject private var riveViewModel = RiveViewModel(fileName: "cat", stateMachineName: "State Machine 1")
     
     var volumePercentage: Int {
@@ -29,8 +28,7 @@ struct ContentView: View {
     }
     
     var body: some View {
-        GeometryReader { geometry in
-            VStack(spacing: 0) {
+        VStack(spacing: 0) {
             // Header with Volume Control
             VStack(spacing: 16) {
                 // Current Device Display
@@ -119,10 +117,9 @@ struct ContentView: View {
             .background(Color(NSColor.controlBackgroundColor).opacity(0.5))
             
             Divider()
-            
+
             // Devices List Section
-            ZStack(alignment: .bottomLeading) {
-                VStack(alignment: .leading, spacing: 0) {
+            VStack(alignment: .leading, spacing: 0) {
                     HStack {
                         Label("Output Devices", systemImage: "speaker.wave.2")
                             .font(.system(size: 12, weight: .semibold))
@@ -161,7 +158,6 @@ struct ContentView: View {
                         .padding(.bottom, 8)
                     }
                 }
-            }
         }
         .frame(width: 320, height: 420)
         .background(VisualEffectView())
@@ -169,10 +165,9 @@ struct ContentView: View {
             // Rive animation as overlay covering entire window for mouse tracking
             ZStack {
                 riveViewModel.view()
-                    .frame(width: 320, height: 420) // Full window size for mouse tracking
-                    .scaleEffect(0.4, anchor: .bottomLeading) // Scale down visually
-                    .allowsHitTesting(true) // Allow mouse interaction
-                    .opacity(1.0)
+                    .frame(width: 320, height: 420)
+                    .scaleEffect(0.4, anchor: .bottomLeading)
+                    .allowsHitTesting(true)
 
                 // Transparent overlay to ensure other UI elements remain interactive
                 Color.clear
@@ -181,15 +176,6 @@ struct ContentView: View {
             }
             .frame(width: 320, height: 420)
         )
-        .onContinuousHover { phase in
-            switch phase {
-            case .active(let location):
-                mouseLocation = location
-            case .ended:
-                break
-            }
-        }
-        }
         .onAppear {
             audioManager.refreshDevices()
             audioManager.refreshCurrentDevice()

@@ -7,7 +7,6 @@
 
 import Foundation
 import CoreAudio
-import SwiftUI
 
 /// Helper to create a FourCharCode from a 4-character String.
 private func fourCharCode(fromString string: String) -> FourCharCode {
@@ -32,10 +31,6 @@ class AudioDeviceManager: ObservableObject {
     private init() {
         refreshDevices()
         refreshCurrentDevice()
-    }
-    
-    deinit {
-        // CoreAudio listener'ları temizle (eğer eklenirse)
     }
     
     static func getVolumeIcon(for volume: Float, isMuted: Bool) -> String {
