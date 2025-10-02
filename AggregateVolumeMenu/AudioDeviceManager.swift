@@ -73,6 +73,7 @@ class AudioDeviceManager: ObservableObject {
         guard let device = currentDevice else { return }
         currentVolume = max(0, min(1, volume))
         setVolume(currentVolume, for: device)
+        NotificationCenter.default.post(name: NSNotification.Name("volumeDidChange"), object: nil)
     }
     
     func adjustVolume(by delta: Float) {
@@ -80,12 +81,14 @@ class AudioDeviceManager: ObservableObject {
         let newVolume = max(0, min(1, currentVolume + delta))
         currentVolume = newVolume
         setVolume(newVolume, for: device)
+        NotificationCenter.default.post(name: NSNotification.Name("volumeDidChange"), object: nil)
     }
     
     func toggleMute() {
         guard let device = currentDevice else { return }
         isMuted.toggle()
         setMute(isMuted, for: device)
+        NotificationCenter.default.post(name: NSNotification.Name("volumeDidChange"), object: nil)
     }
     
     private func getOutputDevices() -> [AudioDevice] {
