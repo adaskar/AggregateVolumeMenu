@@ -117,47 +117,47 @@ struct ContentView: View {
             .background(Color(NSColor.controlBackgroundColor).opacity(0.5))
             
             Divider()
-
+            
             // Devices List Section
             VStack(alignment: .leading, spacing: 0) {
-                    HStack {
-                        Label("Output Devices", systemImage: "speaker.wave.2")
-                            .font(.system(size: 12, weight: .semibold))
-                            .foregroundColor(.secondary)
-
-                        Spacer()
-
-                        Text("\(audioManager.outputDevices.count)")
-                            .font(.system(size: 11, weight: .medium))
-                            .foregroundColor(.secondary)
-                            .padding(.horizontal, 6)
-                            .padding(.vertical, 2)
-                            .background(Color.secondary.opacity(0.15))
-                            .cornerRadius(4)
-                    }
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 10)
-
-                    // Devices List
-                    ScrollView {
-                        VStack(spacing: 1) {
-                            ForEach(audioManager.outputDevices, id: \.id) { device in
-                                DeviceRow(
-                                    device: device,
-                                    isSelected: device == audioManager.currentDevice,
-                                    isHovered: hoveredDevice == device,
-                                    action: {
-                                        audioManager.selectDevice(device)
-                                    }
-                                )
-                                .onHover { hovering in
-                                    hoveredDevice = hovering ? device : nil
+                HStack {
+                    Label("Output Devices", systemImage: "speaker.wave.2")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundColor(.secondary)
+                    
+                    Spacer()
+                    
+                    Text("\(audioManager.outputDevices.count)")
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundColor(.secondary)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(Color.secondary.opacity(0.15))
+                        .cornerRadius(4)
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 10)
+                
+                // Devices List
+                ScrollView {
+                    VStack(spacing: 1) {
+                        ForEach(audioManager.outputDevices, id: \.id) { device in
+                            DeviceRow(
+                                device: device,
+                                isSelected: device == audioManager.currentDevice,
+                                isHovered: hoveredDevice == device,
+                                action: {
+                                    audioManager.selectDevice(device)
                                 }
+                            )
+                            .onHover { hovering in
+                                hoveredDevice = hovering ? device : nil
                             }
                         }
-                        .padding(.bottom, 8)
                     }
+                    .padding(.bottom, 8)
                 }
+            }
         }
         .frame(width: 320, height: 420)
         .background(VisualEffectView())
@@ -168,13 +168,13 @@ struct ContentView: View {
                     .frame(width: 320, height: 420)
                     .scaleEffect(0.4, anchor: .bottomLeading)
                     .allowsHitTesting(true)
-
+                
                 // Transparent overlay to ensure other UI elements remain interactive
                 Color.clear
                     .frame(width: 320, height: 420)
                     .allowsHitTesting(false)
             }
-            .frame(width: 320, height: 420)
+                .frame(width: 320, height: 420)
         )
         .onAppear {
             audioManager.refreshDevices()
