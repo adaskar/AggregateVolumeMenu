@@ -22,17 +22,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private var statusItem: NSStatusItem?
     private var popover: NSPopover?
     private var audioManager = AudioDeviceManager.shared
-    private var volumeObserverTimer: Timer?
-    
     func applicationDidFinishLaunching(_ notification: Notification) {
         setupStatusItem()
         setupPopover()
         setupMediaKeyHandling()
-        observeVolumeChanges()
+        observeVolumeChangeNotifications()
     }
     
-    func applicationWillTerminate(_ notification: Notification) {
-        volumeObserverTimer?.invalidate()
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
     
     private func setupStatusItem() {
@@ -46,10 +44,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
     
-    private func observeVolumeChanges() {
-        volumeObserverTimer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { _ in
-            self.updateMenuBarIcon()
-        }
+    private func observeVolumeChangeNotifications() {
+        NotificationCenter.default.addObserver(self, selector: #selector(volumeDidChange), name: NSNotification.Name("volumeDidChange"), object: nil)
+    }
+    
+    @objc private func volumeDidChange(_ notification: Notification) {
+        updateMenuBarIcon()
     }
     
     private func updateMenuBarIcon() {
