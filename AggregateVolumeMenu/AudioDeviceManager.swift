@@ -7,7 +7,6 @@
 
 import Foundation
 import CoreAudio
-import SwiftUI
 
 /// Helper to create a FourCharCode from a 4-character String.
 private func fourCharCode(fromString string: String) -> FourCharCode {
@@ -23,19 +22,15 @@ let kAudioHardwareServiceDeviceProperty_VirtualMainVolume = AudioObjectPropertyS
 
 class AudioDeviceManager: ObservableObject {
     static let shared = AudioDeviceManager()
-
+    
     @Published var outputDevices: [AudioDevice] = []
     @Published var currentDevice: AudioDevice?
     @Published var currentVolume: Float = 0.0
     @Published var isMuted: Bool = false
-
+    
     private init() {
         refreshDevices()
         refreshCurrentDevice()
-    }
-    
-    deinit {
-        // CoreAudio listener'ları temizle (eğer eklenirse)
     }
     
     static func getVolumeIcon(for volume: Float, isMuted: Bool) -> String {
@@ -54,11 +49,11 @@ class AudioDeviceManager: ObservableObject {
             return "speaker.wave.2.fill"
         }
     }
-
+    
     func refreshDevices() {
         outputDevices = getOutputDevices()
     }
-
+    
     func refreshCurrentDevice() {
         currentDevice = getDefaultOutputDevice()
         if let device = currentDevice {
@@ -66,70 +61,70 @@ class AudioDeviceManager: ObservableObject {
             isMuted = getMute(for: device) ?? false
         }
     }
-
+    
     func selectDevice(_ device: AudioDevice) {
         setDefaultOutputDevice(device)
         currentDevice = device
         currentVolume = getVolume(for: device) ?? 0.0
         isMuted = getMute(for: device) ?? false
     }
-
+    
     func setCurrentVolume(_ volume: Float) {
         guard let device = currentDevice else { return }
         currentVolume = max(0, min(1, volume))
         setVolume(currentVolume, for: device)
     }
-
+    
     func adjustVolume(by delta: Float) {
         guard let device = currentDevice else { return }
         let newVolume = max(0, min(1, currentVolume + delta))
         currentVolume = newVolume
         setVolume(newVolume, for: device)
     }
-
+    
     func toggleMute() {
         guard let device = currentDevice else { return }
         isMuted.toggle()
         setMute(isMuted, for: device)
     }
-
+    
     private func getOutputDevices() -> [AudioDevice] {
         var devices = [AudioDevice]()
-
+        
         var address = AudioObjectPropertyAddress(
             mSelector: kAudioHardwarePropertyDevices,
             mScope: kAudioObjectPropertyScopeGlobal,
             mElement: kAudioObjectPropertyElementMain)
-
+        
         var propsize: UInt32 = 0
         var result = AudioObjectGetPropertyDataSize(AudioObjectID(kAudioObjectSystemObject), &address, 0, nil, &propsize)
         if result != noErr {
             print("Error: Could not get size of device list. Result: \(result)")
             return []
         }
-
+        
         let deviceCount = Int(propsize) / MemoryLayout<AudioDeviceID>.size
         var deviceIDs = [AudioDeviceID](repeating: 0, count: deviceCount)
-
+        
         result = AudioObjectGetPropertyData(AudioObjectID(kAudioObjectSystemObject), &address, 0, nil, &propsize, &deviceIDs)
         if result != noErr {
             print("Error: Could not get device list. Result: \(result)")
             return []
         }
-
+        
         for deviceID in deviceIDs {
             // Check if the device has output channels
             var streamAddress = AudioObjectPropertyAddress(
                 mSelector: kAudioDevicePropertyStreams,
                 mScope: kAudioDevicePropertyScopeOutput,
                 mElement: kAudioObjectPropertyElementMain)
-
+            
             var streamPropsize: UInt32 = 0
             result = AudioObjectGetPropertyDataSize(deviceID, &streamAddress, 0, nil, &streamPropsize)
             if result != noErr || streamPropsize == 0 {
                 continue // Not an output device
             }
-
+            
             // Get device name
             var name: CFString = "" as CFString
             var nameAddress = AudioObjectPropertyAddress(
@@ -137,18 +132,18 @@ class AudioDeviceManager: ObservableObject {
                 mScope: kAudioObjectPropertyScopeGlobal,
                 mElement: kAudioObjectPropertyElementMain)
             var nameSize = UInt32(MemoryLayout<CFString>.size)
-
+            
             result = withUnsafeMutablePointer(to: &name) { pointer in
                 AudioObjectGetPropertyData(deviceID, &nameAddress, 0, nil, &nameSize, pointer)
             }
-
+            
             if result == noErr {
                 devices.append(AudioDevice(id: deviceID, name: name as String))
             }
         }
         return devices
     }
-
+    
     private func getDefaultOutputDevice() -> AudioDevice? {
         var deviceID: AudioDeviceID = 0
         var propsize = UInt32(MemoryLayout<AudioDeviceID>.size)
@@ -156,15 +151,15 @@ class AudioDeviceManager: ObservableObject {
             mSelector: kAudioHardwarePropertyDefaultOutputDevice,
             mScope: kAudioObjectPropertyScopeGlobal,
             mElement: kAudioObjectPropertyElementMain)
-
+        
         let result = AudioObjectGetPropertyData(AudioObjectID(kAudioObjectSystemObject), &address, 0, nil, &propsize, &deviceID)
         if result != noErr {
             return nil
         }
-
+        
         return getOutputDevices().first { $0.id == deviceID }
     }
-
+    
     private func setDefaultOutputDevice(_ device: AudioDevice) {
         var deviceID = device.id
         let propsize = UInt32(MemoryLayout<AudioDeviceID>.size)
@@ -172,17 +167,17 @@ class AudioDeviceManager: ObservableObject {
             mSelector: kAudioHardwarePropertyDefaultOutputDevice,
             mScope: kAudioObjectPropertyScopeGlobal,
             mElement: kAudioObjectPropertyElementMain)
-
+        
         AudioObjectSetPropertyData(AudioObjectID(kAudioObjectSystemObject), &address, 0, nil, propsize, &deviceID)
     }
-
+    
     private func getVolumeForSingleDevice(deviceID: AudioDeviceID) -> Float? {
         var volume: Float = 0.0
         var address = AudioObjectPropertyAddress(
             mSelector: kAudioDevicePropertyVolumeScalar,
             mScope: kAudioDevicePropertyScopeOutput,
             mElement: kAudioObjectPropertyElementMain) // Default to master channel
-
+        
         for channel in [0, 1, 2] { // Check Master, Left, Right
             address.mElement = UInt32(channel)
             if AudioObjectHasProperty(deviceID, &address) {
@@ -193,31 +188,31 @@ class AudioDeviceManager: ObservableObject {
         }
         return nil
     }
-
+    
     private func getVolume(for device: AudioDevice) -> Float? {
         var volume: Float = 0.0
         var address = AudioObjectPropertyAddress(
             mSelector: kAudioHardwareServiceDeviceProperty_VirtualMainVolume,
             mScope: kAudioDevicePropertyScopeOutput,
             mElement: kAudioObjectPropertyElementMain)
-
+        
         // First, try the modern 'virtual main volume' property
         if !AudioObjectHasProperty(device.id, &address) {
             // If that fails, check if it's an aggregate device
             if isAggregateDevice(deviceID: device.id) {
                 let subDevices = getSubDevices(for: device.id)
                 if subDevices.isEmpty { return nil }
-
+                
                 var totalVolume: Float = 0.0
                 var controllableSubDeviceCount = 0
-
+                
                 for subDeviceID in subDevices {
                     if let subVolume = getVolumeForSingleDevice(deviceID: subDeviceID) {
                         totalVolume += subVolume
                         controllableSubDeviceCount += 1
                     }
                 }
-
+                
                 return controllableSubDeviceCount > 0 ? (totalVolume / Float(controllableSubDeviceCount)) : nil
             } else {
                 // It's a normal device, try the scalar property on channels
@@ -230,14 +225,14 @@ class AudioDeviceManager: ObservableObject {
         let result = AudioObjectGetPropertyData(device.id, &address, 0, nil, &propsize, &volume)
         return result == noErr ? volume : nil
     }
-
+    
     private func setVolume(_ volume: Float, for device: AudioDevice) {
         var newVolume = volume
         var address = AudioObjectPropertyAddress(
             mSelector: kAudioHardwareServiceDeviceProperty_VirtualMainVolume,
             mScope: kAudioDevicePropertyScopeOutput,
             mElement: kAudioObjectPropertyElementMain)
-
+        
         // First, try the modern 'virtual main volume' property
         if !AudioObjectHasProperty(device.id, &address) {
             // If that fails, check if it's an aggregate device
@@ -254,17 +249,17 @@ class AudioDeviceManager: ObservableObject {
                 return
             }
         }
-
+        
         // The 'virtual main volume' property exists, so we use it
         let propsize = UInt32(MemoryLayout<Float>.size)
         AudioObjectSetPropertyData(device.id, &address, 0, nil, propsize, &newVolume)
     }
-
+    
     private func setVolumeForSingleDevice(_ volume: Float, for deviceID: AudioDeviceID) {
         var newVolume = volume
         var address = AudioObjectPropertyAddress(mSelector: kAudioDevicePropertyVolumeScalar, mScope: kAudioDevicePropertyScopeOutput, mElement: 0)
         let propsize = UInt32(MemoryLayout<Float>.size)
-
+        
         for channel in [0, 1, 2] { // Set on Master, Left, and Right if they exist
             address.mElement = UInt32(channel)
             if AudioObjectHasProperty(deviceID, &address) {
@@ -311,10 +306,10 @@ class AudioDeviceManager: ObservableObject {
         var transportType: UInt32 = 0
         var propsize = UInt32(MemoryLayout<UInt32>.size)
         let result = AudioObjectGetPropertyData(deviceID, &address, 0, nil, &propsize, &transportType)
-
+        
         return result == noErr && transportType == kAudioDeviceTransportTypeAggregate
     }
-
+    
     private func getSubDevices(for deviceID: AudioDeviceID) -> [AudioDeviceID] {
         var address = AudioObjectPropertyAddress(
             mSelector: kAudioAggregateDevicePropertyActiveSubDeviceList,
@@ -326,7 +321,7 @@ class AudioDeviceManager: ObservableObject {
         if result != noErr || propsize == 0 {
             return []
         }
-
+        
         let subDeviceCount = Int(propsize) / MemoryLayout<AudioDeviceID>.size
         var subDeviceIDs = [AudioDeviceID](repeating: 0, count: subDeviceCount)
         
