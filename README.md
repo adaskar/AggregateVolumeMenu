@@ -17,7 +17,8 @@ If you use an Aggregate Audio Device on macOS, you might have noticed that the s
 
 ## Screenshot
 
-<img width="570" height="452" alt="image" src="https://github.com/user-attachments/assets/4f68dc46-7ab8-4ee2-ac0a-e24d1bf2e2df" />
+<img width="324" height="458" alt="Screenshot 2025-10-04 at 08 07 22" src="https://github.com/user-attachments/assets/484c4d54-6981-426d-83b1-795f3daa8f6d" />
+
 
 ## Getting Started
 
