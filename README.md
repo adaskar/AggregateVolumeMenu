@@ -1,3 +1,5 @@
+Discontinued, please visit https://github.com/easonwong-de/Aggregate-Device-Volume for feature requests
+
 # AggregateVolumeMenu
 
 A simple macOS menu bar application that allows you to control the volume of your selected output device, including Aggregate Devices, right from your menu bar.
